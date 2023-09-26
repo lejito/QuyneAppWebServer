@@ -1,0 +1,19 @@
+# Ignorar directorios generados por Node.js
+**/node_modules/
+
+# Ignorar archivos de registro
+logs/
+*.log
+
+# Ignorar archivos temporales
+*.tmp
+
+# Ignorar archivos de configuración locales
+.env
+
+# Ignorar archivos de dependencias de desarrollo
+devDependencies/
+
+# Ignorar archivos generados por sistemas operativos
+.DS_Store
+Thumbs.db
