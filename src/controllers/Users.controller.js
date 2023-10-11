@@ -84,7 +84,7 @@ class UserController {
       });
       res.status(201).json({ ok: true, message: 'El usuario ha sido actualizado satisfactoriamente' });
     } catch (error) {
-      res.status(error.status || 500).json({ ok: false, message: 'El usuario ha podido ser actualizado, posibles conflictos en la actualizacion' });
+      res.status(error.status || 500).json({ ok: false, message: 'El usuario no ha podido ser actualizado, posibles conflictos en la actualizacion' });
     }
 
   }
