@@ -43,8 +43,8 @@ class UserController {
     try {
 
       const users = await Users.findAll();
-      if (!users) {
-        res.status(204).json({
+      if (users.length == 0) {
+        res.status(200).json({
           ok: true,
           message: "No hay usuarios disponibles",
           info: []
