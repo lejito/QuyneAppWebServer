@@ -12,7 +12,7 @@ const PhoneBundleRouter = require("./PhoneBundle.routes")
 const RechargeRouter = require("./Recharge.routes")
 const WithdrawRouter = require("./Withdraw.routes")
 const router = express.Router();
-
+const PocketTransactionRouter = require('./PocketTransaction.routes');
 
 
 router.use("/users", UserRouter);
@@ -27,4 +27,5 @@ router.use("/phone_recharges", PhoneRechargeRouter);
 router.use("/phone_bundles", PhoneBundleRouter);
 router.use("/recharges", RechargeRouter);
 router.use("/withdraws", WithdrawRouter);
+router.use("/pocket_transactions", PocketTransactionRouter);
 module.exports = router;

@@ -10,6 +10,7 @@ const PhoneRechargeController = require("../controllers/PhoneRecharges.controlle
 const PhoneBundleController = require("../controllers/PhoneBundles.controller")
 const RechargeController = require("../controllers/Recharges.controller")
 const WithdrawController = require("../controllers/Withdraws.controller")
+const PocketTransactionController = require("../controllers/PocketTransactions.controller")
 module.exports = {
     UserController,
     AccountController,
@@ -22,5 +23,6 @@ module.exports = {
     PhoneRechargeController,
     PhoneBundleController,
     RechargeController,
-    WithdrawController
+    WithdrawController,
+    PocketTransactionController
 }
