@@ -5,6 +5,7 @@ const PocketController = require("../controllers/Pockets.controller")
 const InternalTransactionController = require("../controllers/InternalTransactions.controller")
 const ExternalTransactionController = require("../controllers/ExternalTransactions.controller")
 const BillController = require("../controllers/Bills.controller")
+const ReloadCivicaController = require("../controllers/ReloadCivica.controller")
 module.exports = {
     UserController,
     AccountController,
@@ -12,5 +13,6 @@ module.exports = {
     PocketController,
     InternalTransactionController,
     ExternalTransactionController,
-    BillController
+    BillController,
+    ReloadCivicaController
 }
