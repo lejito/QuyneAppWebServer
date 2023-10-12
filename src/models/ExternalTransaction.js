@@ -3,21 +3,25 @@ const sequelize = require("../../config/db");
 const Sequelize = require("sequelize")
 const { DataTypes } = require("sequelize");
 
-const InternalTransaction = sequelize.sequelize.define('transferencias_internas', {
+
+const ExternalTransaction = sequelize.sequelize.define('transferencias_externas', {
     id_movimiento: {
         type: DataTypes.INTEGER,
         allowNull: false,
     },
+    entidad_destino: {
+        type: DataTypes.STRING(20),
+        allowNull: false,
+    },
     cuenta_destino: {
-        type: DataTypes.INTEGER,
+        type: DataTypes.STRING(15),
         allowNull: false,
     },
 }, {
     timestamps: false, // Desactiva las marcas de tiempo automáticas (createdAt, updatedAt)
 });
 
-
-InternalTransaction.sync().then(() => {
-    console.log("Internal transaction Model synced");
+ExternalTransaction.sync().then(() => {
+    console.log("External transaction Model synced");
 }).catch((e) => { console.log(e) });
-module.exports = InternalTransaction;
+module.exports = ExternalTransaction;

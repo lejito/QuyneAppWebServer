@@ -23,6 +23,6 @@ const Transactions = sequelize.sequelize.define('movimientos', {
 
 
 Transactions.sync().then(() => {
-    console.log("Transactions Model synced");
+    console.log("Transaction Model synced");
 }).catch((e) => { console.log(e) });
 module.exports = Transactions;
