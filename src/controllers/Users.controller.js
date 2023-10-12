@@ -14,8 +14,7 @@ class UserController {
       if (!userCreated[0][0].registrar_usuario_cuenta) {
         res.status(400).json({
           ok: false,
-          message: "No ha sido posible crear el usuario, posibles errores en los datos de creacion",
-          info: newUser
+          message: "No ha sido posible crear el usuario, posibles errores en los datos de creacion"
         })
       }
       else {
