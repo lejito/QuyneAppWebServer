@@ -7,6 +7,7 @@ const ExternalTransactionController = require("../controllers/ExternalTransactio
 const BillController = require("../controllers/Bills.controller")
 const ReloadCivicaController = require("../controllers/ReloadCivica.controller")
 const PhoneRechargeController = require("../controllers/PhoneRecharges.controller")
+const PhoneBundleController = require("../controllers/PhoneBundles.controller")
 module.exports = {
     UserController,
     AccountController,
@@ -16,5 +17,6 @@ module.exports = {
     ExternalTransactionController,
     BillController,
     ReloadCivicaController,
-    PhoneRechargeController
+    PhoneRechargeController,
+    PhoneBundleController
 }

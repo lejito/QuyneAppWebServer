@@ -8,6 +8,7 @@ const ExternalTransactionRouter = require("./ExternalTransaction.routes")
 const BillRouter = require('./Bill.routes');
 const ReloadCivicaRouter = require('./ReloadCivica.routes');
 const PhoneRechargeRouter = require("./PhoneRecharge.routes")
+const PhoneBundleRouter = require("./PhoneBundle.routes")
 const router = express.Router();
 
 router.use("/users", UserRouter);
@@ -19,4 +20,5 @@ router.use("/external_transactions", ExternalTransactionRouter);
 router.use("/bills", BillRouter);
 router.use("/reload_civica", ReloadCivicaRouter);
 router.use("/phone_recharges", PhoneRechargeRouter);
+router.use("/phone_bundles", PhoneBundleRouter);
 module.exports = router;
