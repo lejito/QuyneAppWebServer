@@ -10,7 +10,7 @@ const ReloadCivicaRouter = require('./ReloadCivica.routes');
 const PhoneRechargeRouter = require("./PhoneRecharge.routes")
 const PhoneBundleRouter = require("./PhoneBundle.routes")
 const router = express.Router();
-
+const RechargeRouter = require("./Recharge.routes")
 router.use("/users", UserRouter);
 router.use("/accounts", AccountRouter);
 router.use("/transactions", TransactionRouter);
@@ -21,4 +21,5 @@ router.use("/bills", BillRouter);
 router.use("/reload_civica", ReloadCivicaRouter);
 router.use("/phone_recharges", PhoneRechargeRouter);
 router.use("/phone_bundles", PhoneBundleRouter);
+router.use("/recharges", RechargeRouter);
 module.exports = router;
