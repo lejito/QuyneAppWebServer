@@ -74,6 +74,29 @@ class AccountController {
         }
 
     }
+    /**
+ *
+ * @param {import('express').Request} req
+ * @param {import('express').Response} res
+ */
+    async validate(req, res) {
+
+        const { tipo_documento, numero_documento, clave } = req.body;
+        try {
+            const valid = await sequelize.query(`SELECT verificar_credenciales('${tipo_documento}', '${numero_documento}', '${clave}');`);
+            if (valid[0][0].verificar_credenciales == 1) {
+                res.status(200).json({ "ok": true, "message": "Las credenciales son correctas, incio de sesion es valido" });
+            }
+            else {
+                res.status(200).json({ "ok": false, 'message': "La validacion fue realizada y las credenciales no son correctas, intente de nuevo" });
+            }
+        }
+        catch {
+            res.status(500).json({ "ok": false, "message": "No fue posible realizar la validación, posibles fallos en el servidor" });
+
+        }
+
+    }
 
 
 }
