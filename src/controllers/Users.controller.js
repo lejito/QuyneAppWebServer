@@ -93,9 +93,9 @@ class UserController {
 * @param {import('express').Response} res
 */
   async findOne(req, res) {
-    let idUser = req.params.id
+    let numero_documento = req.params.id
     try {
-      const user = await Users.findOne({ where: { id: idUser } });
+      const user = await Users.findOne({ where: { numero_documento: numero_documento } });
       if (!user) { res.status(400).json({ ok: false, message: "No existe un usuario con las condicciones pedidas" }) }
       else { res.status(200).json({ ok: true, message: "El usuario ha sido encontrado correctamente", info: user }) }
 
