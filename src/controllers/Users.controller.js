@@ -12,7 +12,7 @@ class UserController {
 
       const userCreated = await sequelize.query(`select registrar_usuario_cuenta('${tipo_documento}', '${numero_documento}', '${primer_nombre}', ${segundo_nombre ? "'" + segundo_nombre + "'" : null}, '${primer_apellido}', ${segundo_apellido ? "'" + segundo_apellido + "'" : null}, '${fecha_nacimiento}', '${correo_electronico}', '${clave}', '${numero_telefono}' );`);
       if (!userCreated[0][0].registrar_usuario_cuenta) {
-        res.status(400).json({
+        res.status(200).json({
           ok: false,
           message: "No ha sido posible crear el usuario, posibles errores en los datos de creacion"
         })
