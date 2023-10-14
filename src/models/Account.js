@@ -17,6 +17,11 @@ const Account = sequelize.sequelize.define('cuentas', {
         allowNull: false,
         defaultValue: 0,
     },
+    saldo_oculto: {
+        type: DataTypes.BOOLEAN,
+        allowNull: false,
+        defaultValue: false,
+    },
     habilitada: {
         type: DataTypes.BOOLEAN,
         allowNull: false,
