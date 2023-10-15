@@ -1,11 +1,10 @@
 "use strict";
-const routes = require('./src/routes')
+const routes = require('./src/routes');
 const express = require('express');
 const app = express();
 
-const port = process.env.PORT || 3000
+app.use(express.json());
 
-app.use(express.json())
 app.use((req, res, next) => {
   res.header("Access-Control-Allow-Origin", "*");
   res.header(
@@ -16,9 +15,12 @@ app.use((req, res, next) => {
   res.header("Allow", "GET, POST, OPTIONS, PUT, DELETE");
   next();
 });
-// IMPORTAR ROUTER
+
+// Importar rutas
 const router = require("./src/routes/index.js");
 app.use(router);
-//Configurar rutas
+
+// Configurar rutas
 app.use("/api", routes);
+
 module.exports = app;

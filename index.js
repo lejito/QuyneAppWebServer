@@ -1,22 +1,26 @@
 "use strict";
 const dotenv = require('dotenv');
 dotenv.config();
-//cargar el modulo con la configuración de la api
+const port = process.env.PORT || 3000;
+
+// Cargar el módulo con la configuración de la API
 const app = require("./app");
-//realizar la conexión con la base de datos postgresql
-const { sequelize } = require('./config/db');
+
+// Realizar la conexión con la base de datos PostgreSQL
+const sequelize = require('./db');
+
 const runServer = async () => {
   try {
     await sequelize.authenticate();
-    app.listen(parseInt(process.env.PORT), () => {
+    app.listen(port, () => {
       console.log(
-        `Servidor corriendo correctamente en la url: localhost:${process.env.PORT}`
+        `Servidor ejecutándose correctamente en el puerto ${port}`
       );
     })
   } catch (error) {
-    console.log("Ha ocurrido un error");
+    console.log("Ha ocurrido un error al intentar ejecutar el servidor:");
     console.log(error);
   }
 }
 
-runServer()
+runServer();
