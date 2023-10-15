@@ -9,7 +9,7 @@ class TransactionController {
     async findAllByAccount(req, res) {
         try {
             const id = req.params.id
-            const { amount } = req.body
+            const amount = undefined;
             const Transactions = await sequelize.query(`SELECT * FROM consultar_ultimos_movimientos(${id},${typeof amount === typeof undefined ? amount : 1000000});`);
             if (Transactions[0].length == 0) {
                 res.status(200).json({
