@@ -58,23 +58,23 @@ module.exports = {
       } else if (!param.nullable) {
         if (req.body[param.name] === null || req.body[param.name] === undefined) {
           nullParams.push(param);
+        } else if (!(typeof req.body[param.name] === param.type)) {
+          invalidParams.push(param);
         }
-      } else if (!(typeof req.body[param.name] === param.type)) {
-        invalidParams.push(param);
       }
+    }
 
-      if (missingParams.length > 0 || invalidParams.length > 0 || nullParams.length > 0) {
-        res.status(400).json(createResponseRequired(
-          this.errorResponse(
-            'Los datos proporcionados no son los suficientes, son nulos o no son del tipo válido.',
-            null
-          ),
-          { missingParams, nullParams, invalidParams }
-        ));
-        return false;
-      } else {
-        return true;
-      }
+    if (missingParams.length > 0 || invalidParams.length > 0 || nullParams.length > 0) {
+      res.status(400).json(createResponseRequired(
+        this.errorResponse(
+          'Los datos proporcionados no son los suficientes, son nulos o no son del tipo válido.',
+          null
+        ),
+        { missingParams, nullParams, invalidParams }
+      ));
+      return false;
+    } else {
+      return true;
     }
   }
 }
