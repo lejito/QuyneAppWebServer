@@ -76,5 +76,28 @@ module.exports = {
     } else {
       return true;
     }
+  },
+
+  convertSnakeToCamel(obj) {
+    if (obj === null || typeof obj !== "object") {
+      return obj;
+    }
+  
+    if (Array.isArray(obj)) {
+      return obj.map((item) => this.convertSnakeToCamel(item));
+    }
+  
+    const camelCaseObj = {};
+    for (const key in obj) {
+      if (Object.prototype.hasOwnProperty.call(obj, key)) {
+        const camelKey = key.replace(/_./g, (match) => match.charAt(1).toUpperCase());
+        camelCaseObj[camelKey] = obj[key];
+      }
+    }
+  
+    return camelCaseObj;
   }
+  
+
+
 }
