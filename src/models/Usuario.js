@@ -65,8 +65,7 @@ const User = sequelize.define("Usuario",
 			allowNull: false,
 			defaultValue: DataTypes.NOW,
 			field: "fecha_creacion"
-		},
-
+		}
 	},
 	{
 		tableName: "usuarios",
