@@ -1,6 +1,4 @@
 require('dotenv').config();
-const bcrypt = require('bcrypt');
-const jwt = require('jsonwebtoken');
 const sequelize = require("../../db");
 const utils = require("./utils");
 
