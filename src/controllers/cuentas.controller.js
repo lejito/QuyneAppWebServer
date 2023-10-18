@@ -52,7 +52,7 @@ class CuentasController {
       const token = req.headers.authorization;
       const { idUsuario } = jwt.verify(token, process.env.SECRETJWT);
 
-      const idCuenta = this.consultarIdCuentaIdUsuarioAUX(idUsuario);
+      const idCuenta = await CuentasController.prototype.consultarIdCuentaIdUsuarioAUX(idUsuario);
 
       if (idCuenta != -1) {
         res.status(200).json(utils.successResponse(
