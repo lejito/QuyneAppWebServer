@@ -68,58 +68,6 @@ class MovimientosController {
   * @param {import('express').Request} req
   * @param {import('express').Response} res
   */
-  async verificarSaldoSuficiente(req, res) {
-    try {
-      const token = req.headers.authorization;
-
-      if (token) {
-        const { idUsuario } = jwt.verify(token, process.env.SECRETJWT);
-        const idCuenta = await CuentasController.prototype.consultarIdCuentaIdUsuarioAUX(idUsuario);
-        const requiredParams = [PARAM_MONTO];
-
-        if (utils.validateBody(req, res, requiredParams)) {
-          const { monto } = req.body;
-
-          const verificarSaldoSuficiente = await sequelize.query(
-            "SELECT verificar_saldo_suficiente(:idCuenta::INT, :monto::DECIMAL(16,2));",
-            {
-              replacements: { idCuenta, monto }
-            }
-          );
-
-          const saldoSuficiente = verificarSaldoSuficiente[0][0].verificar_saldo_suficiente;
-
-          if (saldoSuficiente != null) {
-            res.status(200).json(utils.successResponse(
-              "Verificación de saldo realizada correctamente.",
-              { saldoSuficiente }
-            ));
-          } else {
-            res.status(200).json(utils.warningResponse(
-              "No se encontró ninguna cuenta.",
-              null
-            ));
-          }
-        }
-      } else {
-        res.status(200).json(utils.errorResponse(
-          'No se puede verificar la suficiencia de saldo. Autenticación no proporcionada.',
-          null
-        ));
-      }
-    } catch (error) {
-      res.status(500).json(utils.errorResponse(
-        "Ha ocurrido un error en el servidor.",
-        null
-      ));
-    }
-  }
-
-  /**
-  *
-  * @param {import('express').Request} req
-  * @param {import('express').Response} res
-  */
   async realizarTransferenciaInterna(req, res) {
     try {
       const token = req.headers.authorization;
@@ -148,6 +96,11 @@ class MovimientosController {
               res.status(200).json(utils.successResponse(
                 "Transferencia interna realizada correctamente.",
                 { movimiento }
+              ));
+            } else {
+              res.status(200).json(utils.errorResponse(
+                "No se realizó la transferencia interna.",
+                null
               ));
             }
           } else {
@@ -204,6 +157,11 @@ class MovimientosController {
                 "Transferencia externa realizada correctamente.",
                 { movimiento }
               ));
+            } else {
+              res.status(200).json(utils.errorResponse(
+                "No se realizó la transferencia externa.",
+                null
+              ));
             }
           } else {
             res.status(200).json(utils.warningResponse(
@@ -258,6 +216,11 @@ class MovimientosController {
               res.status(200).json(utils.successResponse(
                 "Pago de factura realizado correctamente.",
                 { movimiento }
+              ));
+            } else {
+              res.status(200).json(utils.errorResponse(
+                "No se realizó el pago de factura",
+                null
               ));
             }
           } else {
@@ -314,6 +277,11 @@ class MovimientosController {
                 "Recarga de tarjeta cívica realizada correctamente.",
                 { movimiento }
               ));
+            } else {
+              res.status(200).json(utils.errorResponse(
+                "No se realizó la recarga de tarjeta cívica.",
+                null
+              ));
             }
           } else {
             res.status(200).json(utils.warningResponse(
@@ -369,6 +337,11 @@ class MovimientosController {
                 "Recarga de telefonía realizada correctamente.",
                 { movimiento }
               ));
+            } else {
+              res.status(200).json(utils.errorResponse(
+                "No se realizó la recarga de telefonía.",
+                null
+              ));
             }
           } else {
             res.status(200).json(utils.warningResponse(
@@ -423,6 +396,11 @@ class MovimientosController {
               res.status(200).json(utils.successResponse(
                 "Pago de paquete de telefonía realizado correctamente.",
                 { movimiento }
+              ));
+            } else {
+              res.status(200).json(utils.errorResponse(
+                "No se realizó el pago de paquete de telefonía.",
+                null
               ));
             }
           } else {

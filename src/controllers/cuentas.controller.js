@@ -5,6 +5,7 @@ const utils = require("./utils");
 
 const PARAM_ID_CUENTA = utils.createParam('idCuenta', 'number', false);
 const PARAM_NUMERO_TELEFONO = utils.createParam('numeroTelefono', 'string', false);
+const PARAM_MONTO = utils.createParam('monto', 'number', false);
 
 class CuentasController {
   async consultarIdCuentaIdUsuarioAUX(idUsuario) {
@@ -267,6 +268,58 @@ class CuentasController {
         res.status(200).json(utils.successResponse(
           "Verificación de cuenta existente realizada correctamente.",
           { cuentaExistente }
+        ));
+      }
+    } catch (error) {
+      res.status(500).json(utils.errorResponse(
+        "Ha ocurrido un error en el servidor.",
+        null
+      ));
+    }
+  }
+
+  /**
+  *
+  * @param {import('express').Request} req
+  * @param {import('express').Response} res
+  */
+  async verificarSaldoSuficiente(req, res) {
+    try {
+      const token = req.headers.authorization;
+
+      if (token) {
+        const { idUsuario } = jwt.verify(token, process.env.SECRETJWT);
+        const idCuenta = await CuentasController.prototype.consultarIdCuentaIdUsuarioAUX(idUsuario);
+        const requiredParams = [PARAM_MONTO];
+
+        if (utils.validateBody(req, res, requiredParams)) {
+          const { monto } = req.body;
+
+          const verificarSaldoSuficiente = await sequelize.query(
+            "SELECT verificar_saldo_suficiente(:idCuenta::INT, :monto::DECIMAL(16,2));",
+            {
+              replacements: { idCuenta, monto }
+            }
+          );
+
+          const saldoSuficiente = verificarSaldoSuficiente[0][0].verificar_saldo_suficiente;
+
+          if (saldoSuficiente != null) {
+            res.status(200).json(utils.successResponse(
+              "Verificación de saldo realizada correctamente.",
+              { saldoSuficiente }
+            ));
+          } else {
+            res.status(200).json(utils.warningResponse(
+              "No se encontró ninguna cuenta.",
+              null
+            ));
+          }
+        }
+      } else {
+        res.status(200).json(utils.errorResponse(
+          'No se puede verificar la suficiencia de saldo. Autenticación no proporcionada.',
+          null
         ));
       }
     } catch (error) {

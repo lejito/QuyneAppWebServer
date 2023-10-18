@@ -5,7 +5,6 @@ const authMiddleware = require('../middlewares/auth.middleware');
 const MovimientosController = require('../controllers/movimientos.controller');
 
 movimientosRouter.post('/consultar-ultimos', authMiddleware, MovimientosController.prototype.consultarUltimos);
-movimientosRouter.post('/verificar-saldo-suficiente', authMiddleware, MovimientosController.prototype.verificarSaldoSuficiente);
 movimientosRouter.post('/realizar-transferencia-interna', authMiddleware, MovimientosController.prototype.realizarTransferenciaInterna);
 movimientosRouter.post('/realizar-transferencia-externa', authMiddleware, MovimientosController.prototype.realizarTransferenciaExterna);
 movimientosRouter.post('/realizar-pago-factura', authMiddleware, MovimientosController.prototype.realizarPagoFactura);
