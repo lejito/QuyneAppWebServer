@@ -145,19 +145,19 @@ class UsuariosController {
                 { token }
               ));
             } else {
-              res.status(500).json(utils.errorResponse(
+              res.status(200).json(utils.errorResponse(
                 "Hubo un error al intentar recuperar el id del usuario.",
                 null
               ));
             }
           } else {
-            res.status(406).json(utils.errorResponse(
+            res.status(200).json(utils.errorResponse(
               "La contraseña no es válida.",
               null
             ));
           }
         } else {
-          res.status(406).json(utils.errorResponse(
+          res.status(200).json(utils.errorResponse(
             "El tipo y número de documento de identidad no corresponden a un usuario registrado.",
             null
           ));
@@ -195,7 +195,7 @@ class UsuariosController {
           null
         ));
       } else {
-        res.status(401).json(utils.errorResponse(
+        res.status(200).json(utils.errorResponse(
           'No se puede cerrar sesión. Autenticación no proporcionada.',
           null
         ));
@@ -244,13 +244,13 @@ class UsuariosController {
             { usuario: { id, tipoDocumento, numeroDocumento, primerNombre, segundoNombre, primerApellido, segundoApellido, fechaNacimiento, correoElectronico } }
           ));
         } else {
-          res.status(404).json(utils.errorResponse(
+          res.status(200).json(utils.errorResponse(
             "No se encontró ningún usuario con el id especificado.",
             null
           ));
         }
       } else {
-        res.status(401).json(utils.errorResponse(
+        res.status(200).json(utils.errorResponse(
           'No se puede recuperar los datos del usuario. Autenticación no proporcionada.',
           null
         ));

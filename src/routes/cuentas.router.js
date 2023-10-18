@@ -9,5 +9,6 @@ cuentasRouter.post('/consultar-datos', authMiddleware, CuentasController.prototy
 cuentasRouter.post('/consultar-saldo', authMiddleware, CuentasController.prototype.consultarSaldo);
 cuentasRouter.post('/activar-saldo-oculto', authMiddleware, CuentasController.prototype.activarSaldoOculto);
 cuentasRouter.post('/desactivar-saldo-oculto', authMiddleware, CuentasController.prototype.desactivarSaldoOculto);
+cuentasRouter.post('/verificar-existencia-numero-telefono', authMiddleware, CuentasController.prototype.verificarExistenciaNumeroTelefono);
 
 module.exports = cuentasRouter;
