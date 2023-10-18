@@ -4,8 +4,44 @@ const sequelize = require("../../db");
 const utils = require("./utils");
 
 const PARAM_ID_CUENTA = utils.createParam('idCuenta', 'number', false);
+const PARAM_NUMERO_TELEFONO = utils.createParam('numeroTelefono', 'string', false);
 
 class CuentasController {
+  async consultarIdCuentaIdUsuarioAUX(idUsuario) {
+    try {
+      const consultarCodigoCuenta = await sequelize.query(
+        "SELECT consultar_codigo_cuenta_id_usuario(:idUsuario::INT);",
+        {
+          replacements: { idUsuario }
+        }
+      );
+  
+      const idCuenta = consultarCodigoCuenta[0][0].consultar_codigo_cuenta_id_usuario;
+  
+      return idCuenta;
+    } catch (error) {
+      return -1;
+    }
+  }
+  
+  async consultarIdCuentaNumeroTelefonoAUX(numeroTelefono) {
+    try {
+      const consultarCodigoCuentaNumeroTelefono = await sequelize.query(
+        "SELECT consultar_codigo_cuenta_numero_telefono(:numeroTelefono::VARCHAR(10));",
+        {
+          replacements: { numeroTelefono }
+        }
+      );
+  
+      const idCuenta = consultarCodigoCuentaNumeroTelefono[0][0].consultar_codigo_cuenta_numero_telefono;
+  
+      return idCuenta;
+    } catch (error) {
+      console.log(error);
+      return -1;
+    }
+  }
+
   /**
   *
   * @param {import('express').Request} req
@@ -16,14 +52,7 @@ class CuentasController {
       const token = req.headers.authorization;
       const { idUsuario } = jwt.verify(token, process.env.SECRETJWT);
 
-      const consultarCodigoCuenta = await sequelize.query(
-        "SELECT consultar_codigo_cuenta_id_usuario(:idUsuario::INT);",
-        {
-          replacements: { idUsuario }
-        }
-      );
-
-      const idCuenta = consultarCodigoCuenta[0][0].consultar_codigo_cuenta_id_usuario;
+      const idCuenta = this.consultarIdCuentaIdUsuarioAUX(idUsuario);
 
       if (idCuenta != -1) {
         res.status(200).json(utils.successResponse(
@@ -31,7 +60,7 @@ class CuentasController {
           { idCuenta }
         ));
       } else {
-        res.status(404).json(utils.errorResponse(
+        res.status(200).json(utils.errorResponse(
           "No se encontró ninguna cuenta con el usuario especificado.",
           null
         ));
@@ -57,26 +86,26 @@ class CuentasController {
       if (utils.validateBody(req, res, requiredParams)) {
         const { idCuenta } = req.body;
 
-        const consultarCodigoCuenta = await sequelize.query(
+        const consultarCuenta = await sequelize.query(
           "SELECT * FROM consultar_cuenta(:idCuenta::INT);",
           {
             replacements: { idCuenta }
           }
         );
 
-        if (consultarCodigoCuenta[0].length > 0) {
-          const id = consultarCodigoCuenta[0][0].id;
-          const numeroTelefono = consultarCodigoCuenta[0][0].numero_telefono;
-          const idUsuario = consultarCodigoCuenta[0][0].id_usuario;
-          const habilitada = consultarCodigoCuenta[0][0].habilitada;
-          const saldoOculto = consultarCodigoCuenta[0][0].saldo_oculto;
+        if (consultarCuenta[0].length > 0) {
+          const id = consultarCuenta[0][0].id;
+          const numeroTelefono = consultarCuenta[0][0].numero_telefono;
+          const idUsuario = consultarCuenta[0][0].id_usuario;
+          const habilitada = consultarCuenta[0][0].habilitada;
+          const saldoOculto = consultarCuenta[0][0].saldo_oculto;
 
           res.status(200).json(utils.successResponse(
             "Datos de la cuenta recuperados correctamente.",
             { cuenta: { id, numeroTelefono, idUsuario, habilitada, saldoOculto } }
           ));
         } else {
-          res.status(404).json(utils.errorResponse(
+          res.status(200).json(utils.errorResponse(
             "No se encontró ninguna cuenta con el id especificado.",
             null
           ));
@@ -118,7 +147,7 @@ class CuentasController {
             { cuenta: { saldo, saldoBolsillos } }
           ));
         } else {
-          res.status(404).json(utils.errorResponse(
+          res.status(200).json(utils.errorResponse(
             "No se encontró ninguna cuenta con el id especificado.",
             null
           ));
@@ -159,7 +188,7 @@ class CuentasController {
             {}
           ));
         } else {
-          res.status(404).json(utils.errorResponse(
+          res.status(200).json(utils.errorResponse(
             "No se encontró ninguna cuenta con el id especificado.",
             null
           ));
@@ -200,11 +229,45 @@ class CuentasController {
             {}
           ));
         } else {
-          res.status(404).json(utils.errorResponse(
+          res.status(200).json(utils.errorResponse(
             "No se encontró ninguna cuenta con el id especificado.",
             null
           ));
         }
+      }
+    } catch (error) {
+      res.status(500).json(utils.errorResponse(
+        "Ha ocurrido un error en el servidor.",
+        null
+      ));
+    }
+  }
+
+  /**
+  *
+  * @param {import('express').Request} req
+  * @param {import('express').Response} res
+  */
+  async verificarExistenciaNumeroTelefono(req, res) {
+    try {
+      const requiredParams = [PARAM_NUMERO_TELEFONO];
+
+      if (utils.validateBody(req, res, requiredParams)) {
+        const { numeroTelefono } = req.body;
+
+        const verificarExistenciaCuentaNumeroTelefono = await sequelize.query(
+          "SELECT verificar_existencia_cuenta_numero(:numeroTelefono::VARCHAR(10));",
+          {
+            replacements: { numeroTelefono }
+          }
+        );
+
+        const cuentaExistente = verificarExistenciaCuentaNumeroTelefono[0][0].verificar_existencia_cuenta_numero;
+
+        res.status(200).json(utils.successResponse(
+          "Verificación de cuenta existente realizada correctamente.",
+          { cuentaExistente }
+        ));
       }
     } catch (error) {
       res.status(500).json(utils.errorResponse(
