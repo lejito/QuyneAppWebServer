@@ -11,5 +11,6 @@ bolsillosRouter.post('/cargar', authMiddleware, BolsillosController.prototype.ca
 bolsillosRouter.post('/descargar', authMiddleware, BolsillosController.prototype.descargar);
 bolsillosRouter.post('/verificar-saldo-suficiente', authMiddleware, BolsillosController.prototype.verificarSaldoSuficiente);
 bolsillosRouter.post('/eliminar', authMiddleware, BolsillosController.prototype.eliminar);
+bolsillosRouter.post('/consultar-ultimos-movimientos', authMiddleware, BolsillosController.prototype.consultarUltimosMovimientos);
 
 module.exports = bolsillosRouter;

@@ -337,6 +337,46 @@ class BolsillosController {
       ));
     }
   }
+
+  /**
+  *
+  * @param {import('express').Request} req
+  * @param {import('express').Response} res
+  */
+  async consultarUltimosMovimientos(req, res) {
+    try {
+      const requiredParams = [PARAM_ID_BOLSILLO]
+
+      if (utils.validateBody(req, res, requiredParams)) {
+        const { idBolsillo } = req.body;
+
+        const consultarUltimosMovimientosBolsillo = await sequelize.query(
+          "SELECT * FROM consultar_ultimos_movimientos_bolsillo(:idBolsillo::INT);",
+          {
+            replacements: { idBolsillo }
+          }
+        );
+
+        if (consultarUltimosMovimientosBolsillo[0].length > 0) {
+
+          res.status(200).json(utils.successResponse(
+            "Movimientos del bolsillo recuperados correctamente.",
+            { movimientos: utils.convertSnakeToCamel(consultarUltimosMovimientosBolsillo[0]) }
+          ));
+        } else {
+          res.status(200).json(utils.warningResponse(
+            "No se encontró ningún movimiento en el bolsillo.",
+            { movimientos: [] }
+          ));
+        }
+      }
+    } catch (error) {
+      res.status(500).json(utils.errorResponse(
+        "Ha ocurrido un error en el servidor.",
+        null
+      ));
+    }
+  }
 }
 
 module.exports = BolsillosController;
