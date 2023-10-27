@@ -83,25 +83,32 @@ class MovimientosController {
           const idCuentaDestino = await CuentasController.prototype.consultarIdCuentaNumeroTelefonoAUX(numeroTelefono);
 
           if (idCuentaOrigen != -1 && idCuentaDestino != -1) {
-            const realizarTransferenciaInterna = await sequelize.query(
-              "SELECT * FROM realizar_transferencia_interna(:idCuentaOrigen::INT, :idCuentaDestino::INT, :monto::DECIMAL(16,2));",
-              {
-                replacements: { idCuentaOrigen, idCuentaDestino, monto }
-              }
-            );
-
-            if (realizarTransferenciaInterna[0].length > 0) {
-              const movimiento = utils.convertSnakeToCamel(realizarTransferenciaInterna[0][0]);
-
-              res.status(200).json(utils.successResponse(
-                "Transferencia interna realizada correctamente.",
-                { movimiento }
-              ));
-            } else {
-              res.status(200).json(utils.errorResponse(
-                "No se realizó la transferencia interna.",
+            if (idCuentaOrigen == idCuentaDestino) {
+              res.status(200).json(utils.warningResponse(
+                "La cuenta origen y la cuenta destino son las mismas.",
                 null
               ));
+            } else {
+              const realizarTransferenciaInterna = await sequelize.query(
+                "SELECT * FROM realizar_transferencia_interna(:idCuentaOrigen::INT, :idCuentaDestino::INT, :monto::DECIMAL(16,2));",
+                {
+                  replacements: { idCuentaOrigen, idCuentaDestino, monto }
+                }
+              );
+
+              if (realizarTransferenciaInterna[0].length > 0) {
+                const movimiento = utils.convertSnakeToCamel(realizarTransferenciaInterna[0][0]);
+
+                res.status(200).json(utils.successResponse(
+                  "Transferencia interna realizada correctamente.",
+                  { movimiento }
+                ));
+              } else {
+                res.status(200).json(utils.errorResponse(
+                  "No se realizó la transferencia interna.",
+                  null
+                ));
+              }
             }
           } else {
             res.status(200).json(utils.warningResponse(
