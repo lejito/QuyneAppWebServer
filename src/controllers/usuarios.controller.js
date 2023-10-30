@@ -263,6 +263,151 @@ class UsuariosController {
       ));
     }
   }
+
+  /**
+  *
+  * @param {import('express').Request} req
+  * @param {import('express').Response} res
+  */
+  async actualizarDocumentoIdentidad(req, res) {
+    try {
+      const token = req.headers.authorization;
+
+      const { idUsuario } = jwt.verify(token, process.env.SECRETJWT);
+      const requiredParams = [PARAM_TIPO_DOCUMENTO, PARAM_NUMERO_DOCUMENTO];
+
+      if (utils.validateBody(req, res, requiredParams)) {
+        const { tipoDocumento, numeroDocumento } = req.body;
+
+        // Terminar funcionalidad
+      }
+    } catch (error) {
+      res.status(500).json(utils.errorResponse(
+        "Ha ocurrido un error en el servidor.",
+        null
+      ));
+    }
+  }
+
+  /**
+  *
+  * @param {import('express').Request} req
+  * @param {import('express').Response} res
+  */
+  async actualizarNombreCompleto(req, res) {
+    try {
+      const token = req.headers.authorization;
+
+      const { idUsuario } = jwt.verify(token, process.env.SECRETJWT);
+      const requiredParams = [PARAM_PRIMER_NOMBRE, PARAM_SEGUNDO_NOMBRE, PARAM_PRIMER_APELLIDO, PARAM_SEGUNDO_APELLIDO];
+
+      if (utils.validateBody(req, res, requiredParams)) {
+        const { primerNombre, segundoNombre, primerApellido, segundoApellido } = req.body;
+
+        // Terminar funcionalidad
+      }
+    } catch (error) {
+      res.status(500).json(utils.errorResponse(
+        "Ha ocurrido un error en el servidor.",
+        null
+      ));
+    }
+  }
+
+  /**
+  *
+  * @param {import('express').Request} req
+  * @param {import('express').Response} res
+  */
+  async actualizarFechaNacimiento(req, res) {
+    try {
+      const token = req.headers.authorization;
+
+      const { idUsuario } = jwt.verify(token, process.env.SECRETJWT);
+      const requiredParams = [PARAM_FECHA_NACIMIENTO];
+
+      if (utils.validateBody(req, res, requiredParams)) {
+        const { fechaNacimiento } = req.body;
+
+        // Terminar funcionalidad
+      }
+    } catch (error) {
+      res.status(500).json(utils.errorResponse(
+        "Ha ocurrido un error en el servidor.",
+        null
+      ));
+    }
+  }
+
+  /**
+  *
+  * @param {import('express').Request} req
+  * @param {import('express').Response} res
+  */
+  async actualizarCorreoElectronico(req, res) {
+    try {
+      const token = req.headers.authorization;
+
+      const { idUsuario } = jwt.verify(token, process.env.SECRETJWT);
+      const requiredParams = [PARAM_CORREO_ELECTRONICO];
+
+      if (utils.validateBody(req, res, requiredParams)) {
+        const { correoElectronico } = req.body;
+
+        // Terminar funcionalidad
+      }
+    } catch (error) {
+      res.status(500).json(utils.errorResponse(
+        "Ha ocurrido un error en el servidor.",
+        null
+      ));
+    }
+  }
+
+  /**
+  *
+  * @param {import('express').Request} req
+  * @param {import('express').Response} res
+  */
+  async actualizarClave(req, res) {
+    try {
+      const token = req.headers.authorization;
+
+      const { idUsuario } = jwt.verify(token, process.env.SECRETJWT);
+      const requiredParams = [PARAM_CORREO_ELECTRONICO];
+
+      if (utils.validateBody(req, res, requiredParams)) {
+        const { claveActual, clave } = req.body;
+
+        // Terminar funcionalidad
+      }
+    } catch (error) {
+      res.status(500).json(utils.errorResponse(
+        "Ha ocurrido un error en el servidor.",
+        null
+      ));
+    }
+  }
+
+  /**
+  *
+  * @param {import('express').Request} req
+  * @param {import('express').Response} res
+  */
+  async consultarRegistrosActividad(req, res) {
+    try {
+      const token = req.headers.authorization;
+
+      const { idUsuario } = jwt.verify(token, process.env.SECRETJWT);
+
+      // Terminar funcionalidad (ESTA FUNCIÓN NO REQUIERE NADA EN EL BODY)
+    } catch (error) {
+      res.status(500).json(utils.errorResponse(
+        "Ha ocurrido un error en el servidor.",
+        null
+      ));
+    }
+  }
 }
 
 module.exports = UsuariosController;

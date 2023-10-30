@@ -319,6 +319,74 @@ class CuentasController {
       ));
     }
   }
+
+  /**
+  *
+  * @param {import('express').Request} req
+  * @param {import('express').Response} res
+  */
+  async actualizarNumeroTelefono(req, res) {
+    try {
+      const token = req.headers.authorization;
+
+      const { idUsuario } = jwt.verify(token, process.env.SECRETJWT);
+      const idCuenta = await CuentasController.prototype.consultarIdCuentaIdUsuarioAUX(idUsuario);
+      const requiredParams = [PARAM_NUMERO_TELEFONO];
+
+      if (utils.validateBody(req, res, requiredParams)) {
+        const { numeroTelefono } = req.body;
+
+        // Terminar funcionalidad
+      }
+    } catch (error) {
+      res.status(500).json(utils.errorResponse(
+        "Ha ocurrido un error en el servidor.",
+        null
+      ));
+    }
+  }
+
+  /**
+  *
+  * @param {import('express').Request} req
+  * @param {import('express').Response} res
+  */
+  async bloquear(req, res) {
+    try {
+      const token = req.headers.authorization;
+
+      const { idUsuario } = jwt.verify(token, process.env.SECRETJWT);
+      const idCuenta = await CuentasController.prototype.consultarIdCuentaIdUsuarioAUX(idUsuario);
+
+      // Terminar funcionalidad (ESTA FUNCIÓN NO REQUIERE NADA EN EL BODY)
+    } catch (error) {
+      res.status(500).json(utils.errorResponse(
+        "Ha ocurrido un error en el servidor.",
+        null
+      ));
+    }
+  }
+
+  /**
+  *
+  * @param {import('express').Request} req
+  * @param {import('express').Response} res
+  */
+  async desbloquear(req, res) {
+    try {
+      const token = req.headers.authorization;
+
+      const { idUsuario } = jwt.verify(token, process.env.SECRETJWT);
+      const idCuenta = await CuentasController.prototype.consultarIdCuentaIdUsuarioAUX(idUsuario);
+
+      // Terminar funcionalidad (ESTA FUNCIÓN NO REQUIERE NADA EN EL BODY)
+    } catch (error) {
+      res.status(500).json(utils.errorResponse(
+        "Ha ocurrido un error en el servidor.",
+        null
+      ));
+    }
+  }
 }
 
 module.exports = CuentasController;

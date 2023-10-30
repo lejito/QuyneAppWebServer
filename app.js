@@ -16,10 +16,6 @@ app.use((req, res, next) => {
   next();
 });
 
-// Importar rutas
-const router = require("./src/routes/index.js");
-app.use(router);
-
 // Configurar rutas
 app.use("/api", routes);
 
