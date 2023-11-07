@@ -354,7 +354,7 @@ class UsuariosController {
       if (utils.validateBody(req, res, requiredParams)) {
         const { correoElectronico } = req.body;
 
-        // Terminar funcionalidad
+      
       }
     } catch (error) {
       res.status(500).json(utils.errorResponse(
