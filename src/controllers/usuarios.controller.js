@@ -353,7 +353,25 @@ class UsuariosController {
 
       if (utils.validateBody(req, res, requiredParams)) {
         const { correoElectronico } = req.body;
-
+        const editarCorreo = await sequelize.query(
+          "SELECT actualizar_correo_electronico(:idUsuario::INT,:correoElectronico::VARCHAR(120));",
+          {
+            replacements: { idUsuario, correoElectronico }
+          }
+        );
+        const correoActualizado = editarCorreo[0][0].actualizar_correo_electronico;
+        
+        if (correoActualizado){
+          res.status(200).json(utils.successResponse(
+            "Correo Actualizado correctamente.",
+            { correoActualizado }
+          ));
+        }else{
+          res.status(200).json(utils.errorResponse(
+            "El correo no fue actualizado.",
+            null
+          ));
+        }
       
       }
     } catch (error) {
