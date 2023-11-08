@@ -328,8 +328,26 @@ class UsuariosController {
 
       if (utils.validateBody(req, res, requiredParams)) {
         const { fechaNacimiento } = req.body;
+        const editarFechaNacimiento = await sequelize.query(
+          "SELECT actualizar_fecha_nacimiento(:idUsuario::INT,:fechaNacimiento::DATE);",
+          {
+            replacements: { idUsuario, fechaNacimiento }
+          }
+        );
+        const fechaActualizada = editarFechaNacimiento[0][0].actualizar_fecha_nacimiento;
 
-        // Terminar funcionalidad
+        if (correoActualizado){
+          res.status(200).json(utils.successResponse(
+            "Fecha de nacimiento actualizada correctamente.",
+            { fechaActualizada }
+          ));
+        }else{
+          res.status(200).json(utils.errorResponse(
+            "La fecha de nacimiento no fue actualizada.",
+            null
+          ));
+          
+        }
       }
     } catch (error) {
       res.status(500).json(utils.errorResponse(
