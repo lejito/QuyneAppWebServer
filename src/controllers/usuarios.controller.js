@@ -303,9 +303,26 @@ class UsuariosController {
 
       if (utils.validateBody(req, res, requiredParams)) {
         const { primerNombre, segundoNombre, primerApellido, segundoApellido } = req.body;
-
-        // Terminar funcionalidad
+        const editarNombreCompleto = await sequelize.query(
+          "SELECT actualizar_nombre(:idUsuario::INT,:primerNombre::VARCHAR(20),:segundoNombre::VARCHAR(20),:primerApellido::VARCHAR(20),:segundoApellido:VARCHAR(20));",
+          {
+            replacements: { idUsuario, primerNombre,segundoNombre,primerApellido,segundoApellido}
+          }
+        );
+        const nombreActualizado = editarNombreCompleto[0][0].actualizar_nombre;
+        if (nombreActualizado){
+          res.status(200).json(utils.successResponse(
+            "El nombre fue actualizado correctamente.",
+            { nombreActualizado }
+          ));
+        }else{
+          res.status(200).json(utils.errorResponse(
+            "El nombre NO fue actualizado.",
+            null
+          ));
+        }
       }
+
     } catch (error) {
       res.status(500).json(utils.errorResponse(
         "Ha ocurrido un error en el servidor.",
