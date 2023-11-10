@@ -471,7 +471,25 @@ class UsuariosController {
 
       const { idUsuario } = jwt.verify(token, process.env.SECRETJWT);
 
-      // Terminar funcionalidad (ESTA FUNCIÓN NO REQUIERE NADA EN EL BODY)
+      const consultarRegistrosActividad = await sequelize.query(
+        "SELECT * FROM consultar_registros_actividad(:idCuenta::INT);",
+        {
+          replacements: { idCuenta}
+        }
+      );
+
+      if (consultarRegistrosActividad[0].length > 0) {
+
+        res.status(200).json(utils.successResponse(
+          "Registros recuperados correctamente.",
+          { registros: utils.convertSnakeToCamel(consultarRegistrosActividad[0]) }
+        ));
+      } else {
+        res.status(200).json(utils.warningResponse(
+          "No se encontró ningún registro.",
+          { registros: [] }
+        ));
+      }    
     } catch (error) {
       res.status(500).json(utils.errorResponse(
         "Ha ocurrido un error en el servidor.",
