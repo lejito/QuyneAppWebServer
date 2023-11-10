@@ -12,6 +12,7 @@ usuariosRouter.post('/actualizar-nombre', authMiddleware, UsuariosController.pro
 usuariosRouter.post('/actualizar-fecha-nacimiento', authMiddleware, UsuariosController.prototype.actualizarFechaNacimiento);
 usuariosRouter.post('/actualizar-correo', authMiddleware, UsuariosController.prototype.actualizarCorreoElectronico);
 usuariosRouter.post('/actualizar-documento', authMiddleware, UsuariosController.prototype.actualizarDocumentoIdentidad);
+usuariosRouter.post('/consultar-registros-actividad', authMiddleware, UsuariosController.prototype.consultarRegistrosActividad);
 
 module.exports = usuariosRouter;
 
