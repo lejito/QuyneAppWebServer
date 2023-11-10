@@ -10,3 +10,7 @@ usuariosRouter.post('/cerrar-sesion', authMiddleware, UsuariosController.prototy
 usuariosRouter.post('/consultar-datos', authMiddleware, UsuariosController.prototype.consultarDatos);
 
 module.exports = usuariosRouter;
+
+usuariosRouter.post('/actualizar-nombre', authMiddleware, UsuariosController.prototype.actualizarNombreCompleto);
+usuariosRouter.post('/actualizar-fecha-nacimiento', authMiddleware, UsuariosController.prototype.actualizarFechaNacimiento);
+usuariosRouter.post('/actualizar-correo', authMiddleware, UsuariosController.prototype.actualizarCorreoElectronico);
