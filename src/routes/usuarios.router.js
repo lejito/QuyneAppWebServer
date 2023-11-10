@@ -8,9 +8,10 @@ usuariosRouter.post('/crear-usuario-cuenta', UsuariosController.prototype.crearU
 usuariosRouter.post('/iniciar-sesion', UsuariosController.prototype.iniciarSesion);
 usuariosRouter.post('/cerrar-sesion', authMiddleware, UsuariosController.prototype.cerrarSesion);
 usuariosRouter.post('/consultar-datos', authMiddleware, UsuariosController.prototype.consultarDatos);
-
-module.exports = usuariosRouter;
-
 usuariosRouter.post('/actualizar-nombre', authMiddleware, UsuariosController.prototype.actualizarNombreCompleto);
 usuariosRouter.post('/actualizar-fecha-nacimiento', authMiddleware, UsuariosController.prototype.actualizarFechaNacimiento);
 usuariosRouter.post('/actualizar-correo', authMiddleware, UsuariosController.prototype.actualizarCorreoElectronico);
+usuariosRouter.post('/actualizar-documento', authMiddleware, UsuariosController.prototype.actualizarDocumentoIdentidad);
+
+module.exports = usuariosRouter;
+
