@@ -279,7 +279,25 @@ class UsuariosController {
       if (utils.validateBody(req, res, requiredParams)) {
         const { tipoDocumento, numeroDocumento } = req.body;
 
-        // Terminar funcionalidad
+        const editarDocumento = await sequelize.query(
+          "SELECT actualizar_documento(:idUsuario::INT,:tipoDocumento::VARCHAR(2),:numeroDocumento::VARCHAR(10));",
+          {
+            replacements: { idUsuario, tipoDocumento,numeroDocumento}
+          }
+        );
+        const DocumentoActualizado = editarDocumento[0][0].actualizar_documento;
+        
+        if (DocumentoActualizado){
+          res.status(200).json(utils.successResponse(
+            "El documento fue actualizado correctamente.",
+            { DocumentoActualizado }
+          ));
+        }else{
+          res.status(200).json(utils.errorResponse(
+            "El documento NO fue actualizado.",
+            null
+          ));
+        }
       }
     } catch (error) {
       res.status(500).json(utils.errorResponse(
