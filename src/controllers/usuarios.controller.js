@@ -279,7 +279,25 @@ class UsuariosController {
       if (utils.validateBody(req, res, requiredParams)) {
         const { tipoDocumento, numeroDocumento } = req.body;
 
-        // Terminar funcionalidad
+        const editarDocumento = await sequelize.query(
+          "SELECT actualizar_documento(:idUsuario::INT,:tipoDocumento::VARCHAR(2),:numeroDocumento::VARCHAR(10));",
+          {
+            replacements: { idUsuario, tipoDocumento,numeroDocumento}
+          }
+        );
+        const DocumentoActualizado = editarDocumento[0][0].actualizar_documento;
+        
+        if (DocumentoActualizado){
+          res.status(200).json(utils.successResponse(
+            "El documento fue actualizado correctamente.",
+            { DocumentoActualizado }
+          ));
+        }else{
+          res.status(200).json(utils.errorResponse(
+            "El documento NO fue actualizado.",
+            null
+          ));
+        }
       }
     } catch (error) {
       res.status(500).json(utils.errorResponse(
@@ -303,9 +321,26 @@ class UsuariosController {
 
       if (utils.validateBody(req, res, requiredParams)) {
         const { primerNombre, segundoNombre, primerApellido, segundoApellido } = req.body;
-
-        // Terminar funcionalidad
+        const editarNombreCompleto = await sequelize.query(
+          "SELECT actualizar_nombre(:idUsuario::INT,:primerNombre::VARCHAR(20),:segundoNombre::VARCHAR(20),:primerApellido::VARCHAR(20),:segundoApellido:VARCHAR(20));",
+          {
+            replacements: { idUsuario, primerNombre,segundoNombre,primerApellido,segundoApellido}
+          }
+        );
+        const nombreActualizado = editarNombreCompleto[0][0].actualizar_nombre;
+        if (nombreActualizado){
+          res.status(200).json(utils.successResponse(
+            "El nombre fue actualizado correctamente.",
+            { nombreActualizado }
+          ));
+        }else{
+          res.status(200).json(utils.errorResponse(
+            "El nombre NO fue actualizado.",
+            null
+          ));
+        }
       }
+
     } catch (error) {
       res.status(500).json(utils.errorResponse(
         "Ha ocurrido un error en el servidor.",
@@ -328,8 +363,26 @@ class UsuariosController {
 
       if (utils.validateBody(req, res, requiredParams)) {
         const { fechaNacimiento } = req.body;
+        const editarFechaNacimiento = await sequelize.query(
+          "SELECT actualizar_fecha_nacimiento(:idUsuario::INT,:fechaNacimiento::DATE);",
+          {
+            replacements: { idUsuario, fechaNacimiento }
+          }
+        );
+        const fechaActualizada = editarFechaNacimiento[0][0].actualizar_fecha_nacimiento;
 
-        // Terminar funcionalidad
+        if (correoActualizado){
+          res.status(200).json(utils.successResponse(
+            "Fecha de nacimiento actualizada correctamente.",
+            { fechaActualizada }
+          ));
+        }else{
+          res.status(200).json(utils.errorResponse(
+            "La fecha de nacimiento no fue actualizada.",
+            null
+          ));
+          
+        }
       }
     } catch (error) {
       res.status(500).json(utils.errorResponse(
@@ -353,8 +406,26 @@ class UsuariosController {
 
       if (utils.validateBody(req, res, requiredParams)) {
         const { correoElectronico } = req.body;
-
-        // Terminar funcionalidad
+        const editarCorreo = await sequelize.query(
+          "SELECT actualizar_correo_electronico(:idUsuario::INT,:correoElectronico::VARCHAR(120));",
+          {
+            replacements: { idUsuario, correoElectronico }
+          }
+        );
+        const correoActualizado = editarCorreo[0][0].actualizar_correo_electronico;
+        
+        if (correoActualizado){
+          res.status(200).json(utils.successResponse(
+            "Correo Actualizado correctamente.",
+            { correoActualizado }
+          ));
+        }else{
+          res.status(200).json(utils.errorResponse(
+            "El correo no fue actualizado.",
+            null
+          ));
+        }
+      
       }
     } catch (error) {
       res.status(500).json(utils.errorResponse(
@@ -400,7 +471,25 @@ class UsuariosController {
 
       const { idUsuario } = jwt.verify(token, process.env.SECRETJWT);
 
-      // Terminar funcionalidad (ESTA FUNCIÓN NO REQUIERE NADA EN EL BODY)
+      const consultarRegistrosActividad = await sequelize.query(
+        "SELECT * FROM consultar_registros_actividad(:idCuenta::INT);",
+        {
+          replacements: { idCuenta}
+        }
+      );
+
+      if (consultarRegistrosActividad[0].length > 0) {
+
+        res.status(200).json(utils.successResponse(
+          "Registros recuperados correctamente.",
+          { registros: utils.convertSnakeToCamel(consultarRegistrosActividad[0]) }
+        ));
+      } else {
+        res.status(200).json(utils.warningResponse(
+          "No se encontró ningún registro.",
+          { registros: [] }
+        ));
+      }    
     } catch (error) {
       res.status(500).json(utils.errorResponse(
         "Ha ocurrido un error en el servidor.",
