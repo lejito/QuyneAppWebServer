@@ -226,7 +226,7 @@ class MovimientosController {
               );
               const numeroTelefono = consultarCuenta[0][0].numero_telefono;
 
-              await axios.post(
+              const { data } = await axios.post(
                 `${process.env.F4YURL}/movimientos/cargar-cuenta`,
                 {
                   entidadOrigen: "quyne",
@@ -236,6 +236,10 @@ class MovimientosController {
                 },
                 { headers: { Authorization: process.env.F4YKEY } }
               );
+
+              if (data.error) {
+                throw Error("Fallo de transferencia en F4Y.");
+              }
             }
 
             const realizarTransferenciaExterna = await sequelize.query(
