@@ -238,7 +238,14 @@ class MovimientosController {
               );
 
               if (data.error) {
-                throw Error("Fallo de transferencia en F4Y.");
+                res
+                .status(200)
+                .json(
+                  utils.errorResponse(
+                    "La cuenta especificada no corresponde con ninguna cuenta de F4Y.",
+                    null
+                  )
+                );
               }
             }
 
