@@ -1,4 +1,5 @@
 require("dotenv").config();
+const axios = require("axios");
 const jwt = require("jsonwebtoken");
 const sequelize = require("../../db");
 const utils = require("./utils");
@@ -216,8 +217,25 @@ class MovimientosController {
             );
 
           if (idCuentaOrigen != -1) {
-            if (entidadDestino == 'F4Y') {
-              // Llamar a la API de F4Y
+            if (entidadDestino == "F4Y") {
+              const consultarCuenta = await sequelize.query(
+                "SELECT * FROM consultar_cuenta(:idCuenta::INT);",
+                {
+                  replacements: { idCuenta: idCuentaOrigen },
+                }
+              );
+              const numeroTelefono = consultarCuenta[0][0].numero_telefono;
+
+              await axios.post(
+                `${process.env.F4YURL}/movimientos/cargar-cuenta`,
+                {
+                  entidadOrigen: "quyne",
+                  cuentaOrigen: numeroTelefono,
+                  cuentaDestino,
+                  monto,
+                },
+                { headers: { Authorization: process.env.F4YKEY } }
+              );
             }
 
             const realizarTransferenciaExterna = await sequelize.query(
@@ -348,7 +366,10 @@ class MovimientosController {
             res
               .status(200)
               .json(
-                utils.warningResponse("El número no coincide con ninguna cuenta de QuyneApp.", null)
+                utils.warningResponse(
+                  "El número no coincide con ninguna cuenta de QuyneApp.",
+                  null
+                )
               );
           }
         }
