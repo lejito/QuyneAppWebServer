@@ -4,46 +4,6 @@ const jwt = require("jsonwebtoken");
 const sequelize = require("../../db");
 const utils = require("./utils");
 
-const PARAM_TIPO_DOCUMENTO = utils.createParam(
-  "tipoDocumento",
-  "string",
-  false
-);
-const PARAM_NUMERO_DOCUMENTO = utils.createParam(
-  "numeroDocumento",
-  "string",
-  false
-);
-const PARAM_PRIMER_NOMBRE = utils.createParam("primerNombre", "string", false);
-const PARAM_SEGUNDO_NOMBRE = utils.createParam("segundoNombre", "string", true);
-const PARAM_PRIMER_APELLIDO = utils.createParam(
-  "primerApellido",
-  "string",
-  false
-);
-const PARAM_SEGUNDO_APELLIDO = utils.createParam(
-  "segundoApellido",
-  "string",
-  true
-);
-const PARAM_FECHA_NACIMIENTO = utils.createParam(
-  "fechaNacimiento",
-  "string",
-  false
-);
-const PARAM_CORREO_ELECTRONICO = utils.createParam(
-  "correoElectronico",
-  "string",
-  false
-);
-const PARAM_CLAVE = utils.createParam("clave", "string", false);
-const PARAM_CLAVE_ACTUAL = utils.createParam("claveActual", "string", false);
-const PARAM_NUMERO_TELEFONO = utils.createParam(
-  "numeroTelefono",
-  "string",
-  false
-);
-
 class UsuariosController {
   /**
    *
@@ -52,128 +12,113 @@ class UsuariosController {
    */
   async crearUsuarioYCuenta(req, res) {
     try {
-      const requiredParams = [
-        PARAM_TIPO_DOCUMENTO,
-        PARAM_NUMERO_DOCUMENTO,
-        PARAM_PRIMER_NOMBRE,
-        PARAM_SEGUNDO_NOMBRE,
-        PARAM_PRIMER_APELLIDO,
-        PARAM_SEGUNDO_APELLIDO,
-        PARAM_FECHA_NACIMIENTO,
-        PARAM_CORREO_ELECTRONICO,
-        PARAM_CLAVE,
-        PARAM_NUMERO_TELEFONO,
-      ];
+      const {
+        tipoDocumento,
+        numeroDocumento,
+        primerNombre,
+        segundoNombre,
+        primerApellido,
+        segundoApellido,
+        fechaNacimiento,
+        correoElectronico,
+        clave,
+        numeroTelefono,
+      } = req.body;
 
-      if (utils.validateBody(req, res, requiredParams)) {
-        const {
-          tipoDocumento,
-          numeroDocumento,
-          primerNombre,
-          segundoNombre,
-          primerApellido,
-          segundoApellido,
-          fechaNacimiento,
-          correoElectronico,
-          clave,
-          numeroTelefono,
-        } = req.body;
+      const usuarioExistenteDocumento = await sequelize.query(
+        "SELECT verificar_existencia_usuario_documento(:tipoDocumento::VARCHAR(2), :numeroDocumento::VARCHAR(10));",
+        {
+          replacements: { tipoDocumento, numeroDocumento },
+        }
+      );
 
-        const usuarioExistenteDocumento = await sequelize.query(
-          "SELECT verificar_existencia_usuario_documento(:tipoDocumento::VARCHAR(2), :numeroDocumento::VARCHAR(10));",
+      const usuarioExistenteCorreo = await sequelize.query(
+        "SELECT verificar_existencia_usuario_correo(:correoElectronico::VARCHAR(120));",
+        {
+          replacements: { correoElectronico },
+        }
+      );
+
+      const cuentaExistenteNumero = await sequelize.query(
+        "SELECT verificar_existencia_cuenta_numero(:numeroTelefono::VARCHAR(10));",
+        {
+          replacements: { numeroTelefono },
+        }
+      );
+
+      if (
+        usuarioExistenteDocumento[0][0].verificar_existencia_usuario_documento
+      ) {
+        res
+          .status(200)
+          .json(
+            utils.errorResponse(
+              "El tipo y número de documento de identidad ingresados ya están registrados en otro usuario.",
+              null
+            )
+          );
+      } else if (
+        usuarioExistenteCorreo[0][0].verificar_existencia_usuario_correo
+      ) {
+        res
+          .status(200)
+          .json(
+            utils.errorResponse(
+              "El correo electrónico ingresado ya está registrado en otro usuario.",
+              null
+            )
+          );
+      } else if (
+        cuentaExistenteNumero[0][0].verificar_existencia_cuenta_numero
+      ) {
+        res
+          .status(200)
+          .json(
+            utils.errorResponse(
+              "El número de teléfono ingresado ya está registrado en otra cuenta.",
+              null
+            )
+          );
+      } else {
+        const salt = await bcrypt.genSalt(10);
+        const hash = await bcrypt.hash(clave, salt);
+
+        const usuarioYCuentaCreados = await sequelize.query(
+          "SELECT registrar_usuario_cuenta(:tipoDocumento::VARCHAR(2), :numeroDocumento::VARCHAR(10), :primerNombre::VARCHAR(20), :segundoNombre::VARCHAR(20), :primerApellido::VARCHAR(20), :segundoApellido::VARCHAR(20), :fechaNacimiento::DATE, :correoElectronico::VARCHAR(120), :clave::VARCHAR(76), :numeroTelefono::VARCHAR(10));",
           {
-            replacements: { tipoDocumento, numeroDocumento },
+            replacements: {
+              tipoDocumento,
+              numeroDocumento,
+              primerNombre,
+              segundoNombre,
+              primerApellido,
+              segundoApellido,
+              fechaNacimiento,
+              correoElectronico,
+              clave: hash,
+              numeroTelefono,
+            },
           }
         );
 
-        const usuarioExistenteCorreo = await sequelize.query(
-          "SELECT verificar_existencia_usuario_correo(:correoElectronico::VARCHAR(120));",
-          {
-            replacements: { correoElectronico },
-          }
-        );
-
-        const cuentaExistenteNumero = await sequelize.query(
-          "SELECT verificar_existencia_cuenta_numero(:numeroTelefono::VARCHAR(10));",
-          {
-            replacements: { numeroTelefono },
-          }
-        );
-
-        if (
-          usuarioExistenteDocumento[0][0].verificar_existencia_usuario_documento
-        ) {
+        if (usuarioYCuentaCreados[0][0].registrar_usuario_cuenta) {
           res
             .status(200)
             .json(
-              utils.errorResponse(
-                "El tipo y número de documento de identidad ingresados ya están registrados en otro usuario.",
-                null
-              )
-            );
-        } else if (
-          usuarioExistenteCorreo[0][0].verificar_existencia_usuario_correo
-        ) {
-          res
-            .status(200)
-            .json(
-              utils.errorResponse(
-                "El correo electrónico ingresado ya está registrado en otro usuario.",
-                null
-              )
-            );
-        } else if (
-          cuentaExistenteNumero[0][0].verificar_existencia_cuenta_numero
-        ) {
-          res
-            .status(200)
-            .json(
-              utils.errorResponse(
-                "El número de teléfono ingresado ya está registrado en otra cuenta.",
+              utils.successResponse(
+                "El usuario y la cuenta fueron creados correctamente. Ya puedes iniciar sesión.",
                 null
               )
             );
         } else {
-          const salt = await bcrypt.genSalt(10);
-          const hash = await bcrypt.hash(clave, salt);
-
-          const usuarioYCuentaCreados = await sequelize.query(
-            "SELECT registrar_usuario_cuenta(:tipoDocumento::VARCHAR(2), :numeroDocumento::VARCHAR(10), :primerNombre::VARCHAR(20), :segundoNombre::VARCHAR(20), :primerApellido::VARCHAR(20), :segundoApellido::VARCHAR(20), :fechaNacimiento::DATE, :correoElectronico::VARCHAR(120), :clave::VARCHAR(76), :numeroTelefono::VARCHAR(10));",
-            {
-              replacements: {
-                tipoDocumento,
-                numeroDocumento,
-                primerNombre,
-                segundoNombre,
-                primerApellido,
-                segundoApellido,
-                fechaNacimiento,
-                correoElectronico,
-                clave: hash,
-                numeroTelefono,
-              },
-            }
-          );
-
-          if (usuarioYCuentaCreados[0][0].registrar_usuario_cuenta) {
-            res
-              .status(200)
-              .json(
-                utils.successResponse(
-                  "El usuario y la cuenta fueron creados correctamente. Ya puedes iniciar sesión.",
-                  null
-                )
-              );
-          } else {
-            res
-              .status(500)
-              .json(
-                utils.errorResponse(
-                  "No se pudo crear el usuario y la cuenta. Verifica la información ingresada.",
-                  null
-                )
-              );
-          }
+          res
+            .status(500)
+            .json(
+              utils.errorResponse(
+                "No se pudo crear el usuario y la cuenta. Verifica la información ingresada.",
+                null
+              )
+            );
         }
       }
     } catch (error) {
@@ -192,83 +137,75 @@ class UsuariosController {
    */
   async iniciarSesion(req, res) {
     try {
-      const requiredParams = [
-        PARAM_TIPO_DOCUMENTO,
-        PARAM_NUMERO_DOCUMENTO,
-        PARAM_CLAVE,
-      ];
+      const { tipoDocumento, numeroDocumento, clave } = req.body;
 
-      if (utils.validateBody(req, res, requiredParams)) {
-        const { tipoDocumento, numeroDocumento, clave } = req.body;
+      const consultarClave = await sequelize.query(
+        "SELECT consultar_clave(:tipoDocumento::VARCHAR(2), :numeroDocumento::VARCHAR(10));",
+        {
+          replacements: { tipoDocumento, numeroDocumento },
+        }
+      );
 
-        const consultarClave = await sequelize.query(
-          "SELECT consultar_clave(:tipoDocumento::VARCHAR(2), :numeroDocumento::VARCHAR(10));",
-          {
-            replacements: { tipoDocumento, numeroDocumento },
-          }
-        );
+      const claveUsuario = consultarClave[0][0].consultar_clave;
 
-        const claveUsuario = consultarClave[0][0].consultar_clave;
+      if (claveUsuario) {
+        const claveCorrecta = await bcrypt.compare(clave, claveUsuario);
 
-        if (claveUsuario) {
-          const claveCorrecta = await bcrypt.compare(clave, claveUsuario);
+        if (claveCorrecta) {
+          const consultarCodigoUsuario = await sequelize.query(
+            "SELECT consultar_codigo_usuario(:tipoDocumento::VARCHAR(2), :numeroDocumento::VARCHAR(10));",
+            {
+              replacements: { tipoDocumento, numeroDocumento },
+            }
+          );
 
-          if (claveCorrecta) {
-            const consultarCodigoUsuario = await sequelize.query(
-              "SELECT consultar_codigo_usuario(:tipoDocumento::VARCHAR(2), :numeroDocumento::VARCHAR(10));",
+          const idUsuario =
+            consultarCodigoUsuario[0][0].consultar_codigo_usuario;
+
+          if (idUsuario != -1) {
+            const token = jwt.sign({ idUsuario }, process.env.SECRETJWT, {
+              expiresIn: "24h",
+            });
+
+            await sequelize.query(
+              "SELECT crear_registro_actividad(:idUsuario::INT, :accion::VARCHAR(50));",
               {
-                replacements: { tipoDocumento, numeroDocumento },
+                replacements: { idUsuario, accion: "Iniciar sesión" },
               }
             );
 
-            const idUsuario =
-              consultarCodigoUsuario[0][0].consultar_codigo_usuario;
-
-            if (idUsuario != -1) {
-              const token = jwt.sign({ idUsuario }, process.env.SECRETJWT, {
-                expiresIn: "24h",
-              });
-
-              await sequelize.query(
-                "SELECT crear_registro_actividad(:idUsuario::INT, :accion::VARCHAR(50));",
-                {
-                  replacements: { idUsuario, accion: "Iniciar sesión" },
-                }
+            res
+              .status(200)
+              .json(
+                utils.successResponse(
+                  "Credenciales válidas. Inicio de sesión realizado correctamente.",
+                  { token }
+                )
               );
-
-              res
-                .status(200)
-                .json(
-                  utils.successResponse(
-                    "Credenciales válidas. Inicio de sesión realizado correctamente.",
-                    { token }
-                  )
-                );
-            } else {
-              res
-                .status(200)
-                .json(
-                  utils.errorResponse(
-                    "Hubo un error al intentar recuperar el id del usuario.",
-                    null
-                  )
-                );
-            }
           } else {
             res
               .status(200)
-              .json(utils.errorResponse("La contraseña no es válida.", null));
+              .json(
+                utils.errorResponse(
+                  "Hubo un error al intentar recuperar el id del usuario.",
+                  null
+                )
+              );
           }
         } else {
           res
             .status(200)
-            .json(
-              utils.errorResponse(
-                "El tipo y número de documento de identidad no corresponden a un usuario registrado.",
-                null
-              )
-            );
+            .json(utils.errorResponse("La contraseña no es válida.", null));
         }
+      } else {
+        res
+          .status(200)
+          .json(
+            utils.errorResponse(
+              "El tipo y número de documento de identidad no corresponden a un usuario registrado.",
+              null
+            )
+          );
       }
     } catch (error) {
       res
@@ -407,36 +344,31 @@ class UsuariosController {
       const token = req.headers.authorization;
 
       const { idUsuario } = jwt.verify(token, process.env.SECRETJWT);
-      const requiredParams = [PARAM_TIPO_DOCUMENTO, PARAM_NUMERO_DOCUMENTO];
 
-      if (utils.validateBody(req, res, requiredParams)) {
-        const { tipoDocumento, numeroDocumento } = req.body;
+      const { tipoDocumento, numeroDocumento } = req.body;
 
-        const editarDocumento = await sequelize.query(
-          "SELECT actualizar_documento_identidad(:idUsuario::INT,:tipoDocumento::VARCHAR(2),:numeroDocumento::VARCHAR(10));",
-          {
-            replacements: { idUsuario, tipoDocumento, numeroDocumento },
-          }
-        );
-        const documentoActualizado =
-          editarDocumento[0][0].actualizar_documento_identidad;
-
-        if (documentoActualizado) {
-          res
-            .status(200)
-            .json(
-              utils.successResponse(
-                "El documento fue actualizado correctamente.",
-                { documentoActualizado }
-              )
-            );
-        } else {
-          res
-            .status(200)
-            .json(
-              utils.errorResponse("El documento NO fue actualizado.", null)
-            );
+      const editarDocumento = await sequelize.query(
+        "SELECT actualizar_documento_identidad(:idUsuario::INT,:tipoDocumento::VARCHAR(2),:numeroDocumento::VARCHAR(10));",
+        {
+          replacements: { idUsuario, tipoDocumento, numeroDocumento },
         }
+      );
+      const documentoActualizado =
+        editarDocumento[0][0].actualizar_documento_identidad;
+
+      if (documentoActualizado) {
+        res
+          .status(200)
+          .json(
+            utils.successResponse(
+              "El documento fue actualizado correctamente.",
+              { documentoActualizado }
+            )
+          );
+      } else {
+        res
+          .status(200)
+          .json(utils.errorResponse("El documento NO fue actualizado.", null));
       }
     } catch (error) {
       res
@@ -457,44 +389,33 @@ class UsuariosController {
       const token = req.headers.authorization;
 
       const { idUsuario } = jwt.verify(token, process.env.SECRETJWT);
-      const requiredParams = [
-        PARAM_PRIMER_NOMBRE,
-        PARAM_SEGUNDO_NOMBRE,
-        PARAM_PRIMER_APELLIDO,
-        PARAM_SEGUNDO_APELLIDO,
-      ];
 
-      if (utils.validateBody(req, res, requiredParams)) {
-        const { primerNombre, segundoNombre, primerApellido, segundoApellido } =
-          req.body;
-        const editarNombreCompleto = await sequelize.query(
-          "SELECT actualizar_nombre_completo(:idUsuario::INT,:primerNombre::VARCHAR(20),:segundoNombre::VARCHAR(20),:primerApellido::VARCHAR(20),:segundoApellido::VARCHAR(20));",
-          {
-            replacements: {
-              idUsuario,
-              primerNombre,
-              segundoNombre,
-              primerApellido,
-              segundoApellido,
-            },
-          }
-        );
-        const nombreActualizado =
-          editarNombreCompleto[0][0].actualizar_nombre_completo;
-        if (nombreActualizado) {
-          res
-            .status(200)
-            .json(
-              utils.successResponse(
-                "El nombre fue actualizado correctamente.",
-                { nombreActualizado }
-              )
-            );
-        } else {
-          res
-            .status(200)
-            .json(utils.errorResponse("El nombre NO fue actualizado.", null));
+      const { primerNombre, segundoNombre, primerApellido, segundoApellido } =
+        req.body;
+      const editarNombreCompleto = await sequelize.query(
+        "SELECT actualizar_nombre_completo(:idUsuario::INT,:primerNombre::VARCHAR(20),:segundoNombre::VARCHAR(20),:primerApellido::VARCHAR(20),:segundoApellido::VARCHAR(20));",
+        {
+          replacements: {
+            idUsuario,
+            primerNombre,
+            segundoNombre,
+            primerApellido,
+            segundoApellido,
+          },
         }
+      );
+      const nombreActualizado =
+        editarNombreCompleto[0][0].actualizar_nombre_completo;
+      if (nombreActualizado) {
+        res.status(200).json(
+          utils.successResponse("El nombre fue actualizado correctamente.", {
+            nombreActualizado,
+          })
+        );
+      } else {
+        res
+          .status(200)
+          .json(utils.errorResponse("El nombre NO fue actualizado.", null));
       }
     } catch (error) {
       res
@@ -515,38 +436,35 @@ class UsuariosController {
       const token = req.headers.authorization;
 
       const { idUsuario } = jwt.verify(token, process.env.SECRETJWT);
-      const requiredParams = [PARAM_FECHA_NACIMIENTO];
 
-      if (utils.validateBody(req, res, requiredParams)) {
-        const { fechaNacimiento } = req.body;
-        const editarFechaNacimiento = await sequelize.query(
-          "SELECT actualizar_fecha_nacimiento(:idUsuario::INT,:fechaNacimiento::DATE);",
-          {
-            replacements: { idUsuario, fechaNacimiento },
-          }
-        );
-        const fechaActualizada =
-          editarFechaNacimiento[0][0].actualizar_fecha_nacimiento;
-
-        if (fechaActualizada) {
-          res
-            .status(200)
-            .json(
-              utils.successResponse(
-                "Fecha de nacimiento actualizada correctamente.",
-                { fechaActualizada }
-              )
-            );
-        } else {
-          res
-            .status(200)
-            .json(
-              utils.errorResponse(
-                "La fecha de nacimiento no fue actualizada.",
-                null
-              )
-            );
+      const { fechaNacimiento } = req.body;
+      const editarFechaNacimiento = await sequelize.query(
+        "SELECT actualizar_fecha_nacimiento(:idUsuario::INT,:fechaNacimiento::DATE);",
+        {
+          replacements: { idUsuario, fechaNacimiento },
         }
+      );
+      const fechaActualizada =
+        editarFechaNacimiento[0][0].actualizar_fecha_nacimiento;
+
+      if (fechaActualizada) {
+        res
+          .status(200)
+          .json(
+            utils.successResponse(
+              "Fecha de nacimiento actualizada correctamente.",
+              { fechaActualizada }
+            )
+          );
+      } else {
+        res
+          .status(200)
+          .json(
+            utils.errorResponse(
+              "La fecha de nacimiento no fue actualizada.",
+              null
+            )
+          );
       }
     } catch (error) {
       res
@@ -567,30 +485,27 @@ class UsuariosController {
       const token = req.headers.authorization;
 
       const { idUsuario } = jwt.verify(token, process.env.SECRETJWT);
-      const requiredParams = [PARAM_CORREO_ELECTRONICO];
 
-      if (utils.validateBody(req, res, requiredParams)) {
-        const { correoElectronico } = req.body;
-        const editarCorreo = await sequelize.query(
-          "SELECT actualizar_correo_electronico(:idUsuario::INT,:correoElectronico::VARCHAR(120));",
-          {
-            replacements: { idUsuario, correoElectronico },
-          }
-        );
-        const correoActualizado =
-          editarCorreo[0][0].actualizar_correo_electronico;
-
-        if (correoActualizado) {
-          res.status(200).json(
-            utils.successResponse("Correo actualizado correctamente.", {
-              correoActualizado,
-            })
-          );
-        } else {
-          res
-            .status(200)
-            .json(utils.errorResponse("El correo no fue actualizado.", null));
+      const { correoElectronico } = req.body;
+      const editarCorreo = await sequelize.query(
+        "SELECT actualizar_correo_electronico(:idUsuario::INT,:correoElectronico::VARCHAR(120));",
+        {
+          replacements: { idUsuario, correoElectronico },
         }
+      );
+      const correoActualizado =
+        editarCorreo[0][0].actualizar_correo_electronico;
+
+      if (correoActualizado) {
+        res.status(200).json(
+          utils.successResponse("Correo actualizado correctamente.", {
+            correoActualizado,
+          })
+        );
+      } else {
+        res
+          .status(200)
+          .json(utils.errorResponse("El correo no fue actualizado.", null));
       }
     } catch (error) {
       res
@@ -611,64 +526,61 @@ class UsuariosController {
       const token = req.headers.authorization;
 
       const { idUsuario } = jwt.verify(token, process.env.SECRETJWT);
-      const requiredParams = [PARAM_CLAVE_ACTUAL, PARAM_CLAVE];
 
-      if (utils.validateBody(req, res, requiredParams)) {
-        const { claveActual, clave } = req.body;
+      const { claveActual, clave } = req.body;
 
-        const obtenerClave = await sequelize.query(
-          "SELECT consultar_clave(:idUsuario::INT);",
-          {
-            replacements: { idUsuario },
-          }
-        );
-        const claveActualDB = obtenerClave[0][0].consultar_clave;
+      const obtenerClave = await sequelize.query(
+        "SELECT consultar_clave(:idUsuario::INT);",
+        {
+          replacements: { idUsuario },
+        }
+      );
+      const claveActualDB = obtenerClave[0][0].consultar_clave;
 
-        if (claveActualDB) {
-          if (await bcrypt.compare(claveActual, claveActualDB)) {
-            const salt = await bcrypt.genSalt(10);
-            const hash = await bcrypt.hash(clave, salt);
-            const actualizarClave = await sequelize.query(
-              "SELECT actualizar_clave(:idUsuario::INT,:clave::VARCHAR(120));",
-              {
-                replacements: { idUsuario, clave: hash },
-              }
-            );
-            const claveActualizada = actualizarClave[0][0].actualizar_clave;
-
-            if (claveActualizada) {
-              res.status(200).json(
-                utils.successResponse("Contraseña actualizada correctamente.", {
-                  claveActualizada,
-                })
-              );
-            } else {
-              res
-                .status(500)
-                .json(
-                  utils.errorResponse(
-                    "Ha ocurrido un error al intentar actualizar la contraseña.",
-                    null
-                  )
-                );
+      if (claveActualDB) {
+        if (await bcrypt.compare(claveActual, claveActualDB)) {
+          const salt = await bcrypt.genSalt(10);
+          const hash = await bcrypt.hash(clave, salt);
+          const actualizarClave = await sequelize.query(
+            "SELECT actualizar_clave(:idUsuario::INT,:clave::VARCHAR(120));",
+            {
+              replacements: { idUsuario, clave: hash },
             }
+          );
+          const claveActualizada = actualizarClave[0][0].actualizar_clave;
+
+          if (claveActualizada) {
+            res.status(200).json(
+              utils.successResponse("Contraseña actualizada correctamente.", {
+                claveActualizada,
+              })
+            );
           } else {
             res
-              .status(200)
+              .status(500)
               .json(
-                utils.errorResponse("La contraseña actual es incorrecta.", null)
+                utils.errorResponse(
+                  "Ha ocurrido un error al intentar actualizar la contraseña.",
+                  null
+                )
               );
           }
         } else {
           res
-            .status(500)
+            .status(200)
             .json(
-              utils.errorResponse(
-                "Ha ocurrido un error al intentar validar la contraseña actual.",
-                null
-              )
+              utils.errorResponse("La contraseña actual es incorrecta.", null)
             );
         }
+      } else {
+        res
+          .status(500)
+          .json(
+            utils.errorResponse(
+              "Ha ocurrido un error al intentar validar la contraseña actual.",
+              null
+            )
+          );
       }
     } catch (error) {
       res
