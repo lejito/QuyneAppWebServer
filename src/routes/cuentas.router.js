@@ -21,25 +21,25 @@ cuentasRouter.get(
   _cuentasController.consultarIdCuentaIdUsuario
 );
 
-cuentasRouter.post(
+cuentasRouter.get(
   "/consultar-datos",
   [authMiddleware],
   _cuentasController.consultarDatos
 );
 
-cuentasRouter.post(
+cuentasRouter.get(
   "/consultar-saldo",
   [authMiddleware],
   _cuentasController.consultarSaldo
 );
 
-cuentasRouter.post(
+cuentasRouter.put(
   "/activar-saldo-oculto",
   [authMiddleware],
   _cuentasController.activarSaldoOculto
 );
 
-cuentasRouter.post(
+cuentasRouter.put(
   "/desactivar-saldo-oculto",
   [authMiddleware],
   _cuentasController.desactivarSaldoOculto

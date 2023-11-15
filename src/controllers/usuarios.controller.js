@@ -581,7 +581,7 @@ class UsuariosController {
       const { idUsuario } = jwt.verify(token, process.env.SECRETJWT);
 
       const consultarRegistrosActividad = await sequelize.query(
-        "SELECT * FROM consultar_registros_actividad(:idUsuario::INT);",
+        "SELECT * FROM consultar_ultimos_registros(:idUsuario::INT);",
         {
           replacements: { idUsuario },
         }

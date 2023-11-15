@@ -39,7 +39,7 @@ const PARAM_MONTO = utils.createParam("monto", "number", false);
 const _movimientosController = new MovimientosController();
 const movimientosRouter = express.Router();
 
-movimientosRouter.post(
+movimientosRouter.get(
   "/consultar-ultimos",
   [authMiddleware],
   _movimientosController.consultarUltimos

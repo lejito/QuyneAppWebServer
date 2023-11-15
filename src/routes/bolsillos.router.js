@@ -13,7 +13,7 @@ const PARAM_MONTO = utils.createParam("monto", "number", false);
 const _bolsillosController = new BolsillosController();
 const bolsillosRouter = express.Router();
 
-bolsillosRouter.post(
+bolsillosRouter.get(
   "/consultar",
   [authMiddleware],
   _bolsillosController.consultar
@@ -25,7 +25,7 @@ bolsillosRouter.post(
   _bolsillosController.crear
 );
 
-bolsillosRouter.post(
+bolsillosRouter.put(
   "/editar",
   [
     authMiddleware,
@@ -56,7 +56,7 @@ bolsillosRouter.post(
   _bolsillosController.descargar
 );
 
-bolsillosRouter.post(
+bolsillosRouter.delete(
   "/eliminar",
   [authMiddleware, validatorMiddleware([PARAM_ID_BOLSILLO])],
   _bolsillosController.eliminar

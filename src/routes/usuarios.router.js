@@ -77,19 +77,19 @@ usuariosRouter.post(
   _usuariosController.iniciarSesion
 );
 
-usuariosRouter.post(
+usuariosRouter.get(
   "/cerrar-sesion",
   [authMiddleware],
   _usuariosController.cerrarSesion
 );
 
-usuariosRouter.post(
+usuariosRouter.get(
   "/consultar-datos",
   [authMiddleware],
   _usuariosController.consultarDatos
 );
 
-usuariosRouter.post(
+usuariosRouter.put(
   "/actualizar-documento",
   [
     authMiddleware,
@@ -98,7 +98,7 @@ usuariosRouter.post(
   _usuariosController.actualizarDocumentoIdentidad
 );
 
-usuariosRouter.post(
+usuariosRouter.put(
   "/actualizar-nombre",
   [
     authMiddleware,
@@ -112,25 +112,25 @@ usuariosRouter.post(
   _usuariosController.actualizarNombreCompleto
 );
 
-usuariosRouter.post(
+usuariosRouter.put(
   "/actualizar-fecha-nacimiento",
   [authMiddleware, validatorMiddleware([PARAM_FECHA_NACIMIENTO])],
   _usuariosController.actualizarFechaNacimiento
 );
 
-usuariosRouter.post(
+usuariosRouter.put(
   "/actualizar-correo",
   [authMiddleware, validatorMiddleware([PARAM_CORREO_ELECTRONICO])],
   _usuariosController.actualizarCorreoElectronico
 );
 
-usuariosRouter.post(
+usuariosRouter.put(
   "/actualizar-clave",
   [authMiddleware, validatorMiddleware([PARAM_CLAVE_ACTUAL, PARAM_CLAVE])],
   _usuariosController.actualizarClave
 );
 
-usuariosRouter.post(
+usuariosRouter.get(
   "/consultar-registros-actividad",
   [authMiddleware],
   _usuariosController.consultarRegistrosActividad
