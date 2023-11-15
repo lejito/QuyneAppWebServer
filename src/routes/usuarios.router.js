@@ -1,18 +1,64 @@
-require('dotenv').config();
-const express = require('express');
+require("dotenv").config();
+const express = require("express");
 const usuariosRouter = express.Router();
-const authMiddleware = require('../middlewares/auth.middleware');
-const UsuariosController = require('../controllers/usuarios.controller');
+const authMiddleware = require("../middlewares/auth.middleware");
+const UsuariosController = require("../controllers/usuarios.controller");
 
-usuariosRouter.post('/crear-usuario-cuenta', UsuariosController.prototype.crearUsuarioYCuenta);
-usuariosRouter.post('/iniciar-sesion', UsuariosController.prototype.iniciarSesion);
-usuariosRouter.post('/cerrar-sesion', authMiddleware, UsuariosController.prototype.cerrarSesion);
-usuariosRouter.post('/consultar-datos', authMiddleware, UsuariosController.prototype.consultarDatos);
-usuariosRouter.post('/actualizar-nombre', authMiddleware, UsuariosController.prototype.actualizarNombreCompleto);
-usuariosRouter.post('/actualizar-fecha-nacimiento', authMiddleware, UsuariosController.prototype.actualizarFechaNacimiento);
-usuariosRouter.post('/actualizar-correo', authMiddleware, UsuariosController.prototype.actualizarCorreoElectronico);
-usuariosRouter.post('/actualizar-documento', authMiddleware, UsuariosController.prototype.actualizarDocumentoIdentidad);
-usuariosRouter.post('/consultar-registros-actividad', authMiddleware, UsuariosController.prototype.consultarRegistrosActividad);
+const _usuariosController = new UsuariosController();
+
+usuariosRouter.post(
+  "/crear-usuario-cuenta",
+  _usuariosController.crearUsuarioYCuenta
+);
+
+usuariosRouter.post("/iniciar-sesion", _usuariosController.iniciarSesion);
+
+usuariosRouter.post(
+  "/cerrar-sesion",
+  authMiddleware,
+  _usuariosController.cerrarSesion
+);
+
+usuariosRouter.post(
+  "/consultar-datos",
+  authMiddleware,
+  _usuariosController.consultarDatos
+);
+
+usuariosRouter.post(
+  "/actualizar-documento",
+  authMiddleware,
+  _usuariosController.actualizarDocumentoIdentidad
+);
+
+usuariosRouter.post(
+  "/actualizar-nombre",
+  authMiddleware,
+  _usuariosController.actualizarNombreCompleto
+);
+
+usuariosRouter.post(
+  "/actualizar-fecha-nacimiento",
+  authMiddleware,
+  _usuariosController.actualizarFechaNacimiento
+);
+
+usuariosRouter.post(
+  "/actualizar-correo",
+  authMiddleware,
+  _usuariosController.actualizarCorreoElectronico
+);
+
+usuariosRouter.post(
+  "/actualizar-clave",
+  authMiddleware,
+  _usuariosController.actualizarClave
+);
+
+usuariosRouter.post(
+  "/consultar-registros-actividad",
+  authMiddleware,
+  _usuariosController.consultarRegistrosActividad
+);
 
 module.exports = usuariosRouter;
-

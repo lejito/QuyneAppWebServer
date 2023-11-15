@@ -1,16 +1,56 @@
-require('dotenv').config();
-const express = require('express');
+require("dotenv").config();
+const express = require("express");
 const movimientosRouter = express.Router();
-const authMiddleware = require('../middlewares/auth.middleware');
-const MovimientosController = require('../controllers/movimientos.controller');
+const authMiddleware = require("../middlewares/auth.middleware");
+const MovimientosController = require("../controllers/movimientos.controller");
 
-movimientosRouter.post('/consultar-ultimos', authMiddleware, MovimientosController.prototype.consultarUltimos);
-movimientosRouter.post('/realizar-transferencia-interna', authMiddleware, MovimientosController.prototype.realizarTransferenciaInterna);
-movimientosRouter.post('/realizar-transferencia-externa', authMiddleware, MovimientosController.prototype.realizarTransferenciaExterna);
-movimientosRouter.post('/realizar-transferencia-externa-carga', MovimientosController.prototype.realizarTransferenciaExternaCarga);
-movimientosRouter.post('/realizar-pago-factura', authMiddleware, MovimientosController.prototype.realizarPagoFactura);
-movimientosRouter.post('/realizar-recarga-civica', authMiddleware, MovimientosController.prototype.realizarRecargaCivica);
-movimientosRouter.post('/realizar-recarga-telefonia', authMiddleware, MovimientosController.prototype.realizarRecargaTelefonia);
-movimientosRouter.post('/realizar-pago-paquete-telefonia', authMiddleware, MovimientosController.prototype.realizarPagoPaqueteTelefonia);
+const _movimientosController = new MovimientosController();
+
+movimientosRouter.post(
+  "/consultar-ultimos",
+  authMiddleware,
+  _movimientosController.consultarUltimos
+);
+
+movimientosRouter.post(
+  "/realizar-transferencia-interna",
+  authMiddleware,
+  _movimientosController.realizarTransferenciaInterna
+);
+
+movimientosRouter.post(
+  "/realizar-transferencia-externa",
+  authMiddleware,
+  _movimientosController.realizarTransferenciaExterna
+);
+
+movimientosRouter.post(
+  "/realizar-transferencia-externa-carga",
+  _movimientosController.realizarTransferenciaExternaCarga
+);
+
+movimientosRouter.post(
+  "/realizar-pago-factura",
+  authMiddleware,
+  _movimientosController.realizarPagoFactura
+);
+
+movimientosRouter.post(
+  "/realizar-recarga-civica",
+  authMiddleware,
+  _movimientosController.realizarRecargaCivica
+);
+
+movimientosRouter.post(
+  "/realizar-recarga-telefonia",
+  authMiddleware,
+  _movimientosController.realizarRecargaTelefonia
+);
+
+movimientosRouter.post(
+  "/realizar-pago-paquete-telefonia",
+  authMiddleware,
+  _movimientosController.realizarPagoPaqueteTelefonia
+);
 
 module.exports = movimientosRouter;

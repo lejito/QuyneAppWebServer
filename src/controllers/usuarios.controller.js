@@ -37,6 +37,7 @@ const PARAM_CORREO_ELECTRONICO = utils.createParam(
   false
 );
 const PARAM_CLAVE = utils.createParam("clave", "string", false);
+const PARAM_CLAVE_ACTUAL = utils.createParam("claveActual", "string", false);
 const PARAM_NUMERO_TELEFONO = utils.createParam(
   "numeroTelefono",
   "string",
@@ -349,26 +350,24 @@ class UsuariosController {
           const fechaNacimiento = consultarDatos[0][0].fecha_nacimiento;
           const correoElectronico = consultarDatos[0][0].correo_electronico;
 
-          res
-            .status(200)
-            .json(
-              utils.successResponse(
-                "Datos del usuario recuperados correctamente.",
-                {
-                  usuario: {
-                    id,
-                    tipoDocumento,
-                    numeroDocumento,
-                    primerNombre,
-                    segundoNombre,
-                    primerApellido,
-                    segundoApellido,
-                    fechaNacimiento,
-                    correoElectronico,
-                  },
-                }
-              )
-            );
+          res.status(200).json(
+            utils.successResponse(
+              "Datos del usuario recuperados correctamente.",
+              {
+                usuario: {
+                  id,
+                  tipoDocumento,
+                  numeroDocumento,
+                  primerNombre,
+                  segundoNombre,
+                  primerApellido,
+                  segundoApellido,
+                  fechaNacimiento,
+                  correoElectronico,
+                },
+              }
+            )
+          );
         } else {
           res
             .status(200)
@@ -414,20 +413,21 @@ class UsuariosController {
         const { tipoDocumento, numeroDocumento } = req.body;
 
         const editarDocumento = await sequelize.query(
-          "SELECT actualizar_documento(:idUsuario::INT,:tipoDocumento::VARCHAR(2),:numeroDocumento::VARCHAR(10));",
+          "SELECT actualizar_documento_identidad(:idUsuario::INT,:tipoDocumento::VARCHAR(2),:numeroDocumento::VARCHAR(10));",
           {
             replacements: { idUsuario, tipoDocumento, numeroDocumento },
           }
         );
-        const DocumentoActualizado = editarDocumento[0][0].actualizar_documento;
+        const documentoActualizado =
+          editarDocumento[0][0].actualizar_documento_identidad;
 
-        if (DocumentoActualizado) {
+        if (documentoActualizado) {
           res
             .status(200)
             .json(
               utils.successResponse(
                 "El documento fue actualizado correctamente.",
-                { DocumentoActualizado }
+                { documentoActualizado }
               )
             );
         } else {
@@ -468,7 +468,7 @@ class UsuariosController {
         const { primerNombre, segundoNombre, primerApellido, segundoApellido } =
           req.body;
         const editarNombreCompleto = await sequelize.query(
-          "SELECT actualizar_nombre(:idUsuario::INT,:primerNombre::VARCHAR(20),:segundoNombre::VARCHAR(20),:primerApellido::VARCHAR(20),:segundoApellido:VARCHAR(20));",
+          "SELECT actualizar_nombre_completo(:idUsuario::INT,:primerNombre::VARCHAR(20),:segundoNombre::VARCHAR(20),:primerApellido::VARCHAR(20),:segundoApellido::VARCHAR(20));",
           {
             replacements: {
               idUsuario,
@@ -479,7 +479,8 @@ class UsuariosController {
             },
           }
         );
-        const nombreActualizado = editarNombreCompleto[0][0].actualizar_nombre;
+        const nombreActualizado =
+          editarNombreCompleto[0][0].actualizar_nombre_completo;
         if (nombreActualizado) {
           res
             .status(200)
@@ -496,6 +497,7 @@ class UsuariosController {
         }
       }
     } catch (error) {
+      console.log(error);
       res
         .status(500)
         .json(
@@ -527,7 +529,7 @@ class UsuariosController {
         const fechaActualizada =
           editarFechaNacimiento[0][0].actualizar_fecha_nacimiento;
 
-        if (correoActualizado) {
+        if (fechaActualizada) {
           res
             .status(200)
             .json(
@@ -580,13 +582,11 @@ class UsuariosController {
           editarCorreo[0][0].actualizar_correo_electronico;
 
         if (correoActualizado) {
-          res
-            .status(200)
-            .json(
-              utils.successResponse("Correo actualizado correctamente.", {
-                correoActualizado,
-              })
-            );
+          res.status(200).json(
+            utils.successResponse("Correo actualizado correctamente.", {
+              correoActualizado,
+            })
+          );
         } else {
           res
             .status(200)
@@ -612,12 +612,64 @@ class UsuariosController {
       const token = req.headers.authorization;
 
       const { idUsuario } = jwt.verify(token, process.env.SECRETJWT);
-      const requiredParams = [PARAM_CORREO_ELECTRONICO];
+      const requiredParams = [PARAM_CLAVE_ACTUAL, PARAM_CLAVE];
 
       if (utils.validateBody(req, res, requiredParams)) {
         const { claveActual, clave } = req.body;
 
-        // Terminar funcionalidad
+        const obtenerClave = await sequelize.query(
+          "SELECT consultar_clave(:idUsuario::INT);",
+          {
+            replacements: { idUsuario },
+          }
+        );
+        const claveActualDB = obtenerClave[0][0].consultar_clave;
+
+        if (claveActualDB) {
+          if (await bcrypt.compare(claveActual, claveActualDB)) {
+            const salt = await bcrypt.genSalt(10);
+            const hash = await bcrypt.hash(clave, salt);
+            const actualizarClave = await sequelize.query(
+              "SELECT actualizar_clave(:idUsuario::INT,:clave::VARCHAR(120));",
+              {
+                replacements: { idUsuario, clave: hash },
+              }
+            );
+            const claveActualizada = actualizarClave[0][0].actualizar_clave;
+
+            if (claveActualizada) {
+              res.status(200).json(
+                utils.successResponse("Contraseña actualizada correctamente.", {
+                  claveActualizada,
+                })
+              );
+            } else {
+              res
+                .status(500)
+                .json(
+                  utils.errorResponse(
+                    "Ha ocurrido un error al intentar actualizar la contraseña.",
+                    null
+                  )
+                );
+            }
+          } else {
+            res
+              .status(200)
+              .json(
+                utils.errorResponse("La contraseña actual es incorrecta.", null)
+              );
+          }
+        } else {
+          res
+            .status(500)
+            .json(
+              utils.errorResponse(
+                "Ha ocurrido un error al intentar validar la contraseña actual.",
+                null
+              )
+            );
+        }
       }
     } catch (error) {
       res
@@ -640,30 +692,26 @@ class UsuariosController {
       const { idUsuario } = jwt.verify(token, process.env.SECRETJWT);
 
       const consultarRegistrosActividad = await sequelize.query(
-        "SELECT * FROM consultar_registros_actividad(:idCuenta::INT);",
+        "SELECT * FROM consultar_registros_actividad(:idUsuario::INT);",
         {
-          replacements: { idCuenta },
+          replacements: { idUsuario },
         }
       );
 
       if (consultarRegistrosActividad[0].length > 0) {
-        res
-          .status(200)
-          .json(
-            utils.successResponse("Registros recuperados correctamente.", {
-              registros: utils.convertSnakeToCamel(
-                consultarRegistrosActividad[0]
-              ),
-            })
-          );
+        res.status(200).json(
+          utils.successResponse("Registros recuperados correctamente.", {
+            registros: utils.convertSnakeToCamel(
+              consultarRegistrosActividad[0]
+            ),
+          })
+        );
       } else {
-        res
-          .status(200)
-          .json(
-            utils.warningResponse("No se encontró ningún registro.", {
-              registros: [],
-            })
-          );
+        res.status(200).json(
+          utils.warningResponse("No se encontró ningún registro.", {
+            registros: [],
+          })
+        );
       }
     } catch (error) {
       res
