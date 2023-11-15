@@ -225,29 +225,18 @@ class UsuariosController {
     try {
       const token = req.headers.authorization;
 
-      if (token) {
-        const { idUsuario } = jwt.verify(token, process.env.SECRETJWT);
+      const { idUsuario } = jwt.verify(token, process.env.SECRETJWT);
 
-        await sequelize.query(
-          "SELECT crear_registro_actividad(:idUsuario::INT, :accion::VARCHAR(50));",
-          {
-            replacements: { idUsuario, accion: "Cerrar sesión" },
-          }
-        );
+      await sequelize.query(
+        "SELECT crear_registro_actividad(:idUsuario::INT, :accion::VARCHAR(50));",
+        {
+          replacements: { idUsuario, accion: "Cerrar sesión" },
+        }
+      );
 
-        res
-          .status(200)
-          .json(utils.successResponse("Sesión cerrada correctamente.", null));
-      } else {
-        res
-          .status(200)
-          .json(
-            utils.errorResponse(
-              "No se puede cerrar sesión. Autenticación no proporcionada.",
-              null
-            )
-          );
-      }
+      res
+        .status(200)
+        .json(utils.successResponse("Sesión cerrada correctamente.", null));
     } catch (error) {
       res
         .status(500)
@@ -266,61 +255,50 @@ class UsuariosController {
     try {
       const token = req.headers.authorization;
 
-      if (token) {
-        const { idUsuario } = jwt.verify(token, process.env.SECRETJWT);
+      const { idUsuario } = jwt.verify(token, process.env.SECRETJWT);
 
-        const consultarDatos = await sequelize.query(
-          "SELECT * FROM consultar_usuario(:idUsuario::INT);",
-          {
-            replacements: { idUsuario },
-          }
-        );
-
-        if (consultarDatos[0].length > 0) {
-          const id = consultarDatos[0][0].id;
-          const tipoDocumento = consultarDatos[0][0].tipo_documento;
-          const numeroDocumento = consultarDatos[0][0].numero_documento;
-          const primerNombre = consultarDatos[0][0].primer_nombre;
-          const segundoNombre = consultarDatos[0][0].segundo_nombre;
-          const primerApellido = consultarDatos[0][0].primer_apellido;
-          const segundoApellido = consultarDatos[0][0].segundo_apellido;
-          const fechaNacimiento = consultarDatos[0][0].fecha_nacimiento;
-          const correoElectronico = consultarDatos[0][0].correo_electronico;
-
-          res.status(200).json(
-            utils.successResponse(
-              "Datos del usuario recuperados correctamente.",
-              {
-                usuario: {
-                  id,
-                  tipoDocumento,
-                  numeroDocumento,
-                  primerNombre,
-                  segundoNombre,
-                  primerApellido,
-                  segundoApellido,
-                  fechaNacimiento,
-                  correoElectronico,
-                },
-              }
-            )
-          );
-        } else {
-          res
-            .status(200)
-            .json(
-              utils.errorResponse(
-                "No se encontró ningún usuario con el id especificado.",
-                null
-              )
-            );
+      const consultarDatos = await sequelize.query(
+        "SELECT * FROM consultar_usuario(:idUsuario::INT);",
+        {
+          replacements: { idUsuario },
         }
+      );
+
+      if (consultarDatos[0].length > 0) {
+        const id = consultarDatos[0][0].id;
+        const tipoDocumento = consultarDatos[0][0].tipo_documento;
+        const numeroDocumento = consultarDatos[0][0].numero_documento;
+        const primerNombre = consultarDatos[0][0].primer_nombre;
+        const segundoNombre = consultarDatos[0][0].segundo_nombre;
+        const primerApellido = consultarDatos[0][0].primer_apellido;
+        const segundoApellido = consultarDatos[0][0].segundo_apellido;
+        const fechaNacimiento = consultarDatos[0][0].fecha_nacimiento;
+        const correoElectronico = consultarDatos[0][0].correo_electronico;
+
+        res.status(200).json(
+          utils.successResponse(
+            "Datos del usuario recuperados correctamente.",
+            {
+              usuario: {
+                id,
+                tipoDocumento,
+                numeroDocumento,
+                primerNombre,
+                segundoNombre,
+                primerApellido,
+                segundoApellido,
+                fechaNacimiento,
+                correoElectronico,
+              },
+            }
+          )
+        );
       } else {
         res
           .status(200)
           .json(
             utils.errorResponse(
-              "No se puede recuperar los datos del usuario. Autenticación no proporcionada.",
+              "No se encontró ningún usuario con el id especificado.",
               null
             )
           );

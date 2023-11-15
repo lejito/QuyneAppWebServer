@@ -14,42 +14,31 @@ class BolsillosController {
     try {
       const token = req.headers.authorization;
 
-      if (token) {
-        const { idUsuario } = jwt.verify(token, process.env.SECRETJWT);
-        const idCuenta =
-          await CuentasController.prototype.consultarIdCuentaIdUsuarioAUX(
-            idUsuario
-          );
-
-        const consultarBolsillos = await sequelize.query(
-          "SELECT * FROM consultar_bolsillos(:idCuenta::INT);",
-          {
-            replacements: { idCuenta },
-          }
+      const { idUsuario } = jwt.verify(token, process.env.SECRETJWT);
+      const idCuenta =
+        await CuentasController.prototype.consultarIdCuentaIdUsuarioAUX(
+          idUsuario
         );
 
-        if (consultarBolsillos[0].length > 0) {
-          res.status(200).json(
-            utils.successResponse("Bolsillos recuperados correctamente.", {
-              bolsillos: utils.convertSnakeToCamel(consultarBolsillos[0]),
-            })
-          );
-        } else {
-          res.status(200).json(
-            utils.warningResponse("No se encontró ningún bolsillo.", {
-              bolsillos: [],
-            })
-          );
+      const consultarBolsillos = await sequelize.query(
+        "SELECT * FROM consultar_bolsillos(:idCuenta::INT);",
+        {
+          replacements: { idCuenta },
         }
+      );
+
+      if (consultarBolsillos[0].length > 0) {
+        res.status(200).json(
+          utils.successResponse("Bolsillos recuperados correctamente.", {
+            bolsillos: utils.convertSnakeToCamel(consultarBolsillos[0]),
+          })
+        );
       } else {
-        res
-          .status(401)
-          .json(
-            utils.errorResponse(
-              "No se puede recuperar los bolsillos. Autenticación no proporcionada.",
-              null
-            )
-          );
+        res.status(200).json(
+          utils.warningResponse("No se encontró ningún bolsillo.", {
+            bolsillos: [],
+          })
+        );
       }
     } catch (error) {
       res
@@ -69,43 +58,32 @@ class BolsillosController {
     try {
       const token = req.headers.authorization;
 
-      if (token) {
-        const { idUsuario } = jwt.verify(token, process.env.SECRETJWT);
-        const idCuenta =
-          await CuentasController.prototype.consultarIdCuentaIdUsuarioAUX(
-            idUsuario
-          );
-
-        const { nombre, saldoObjetivo } = req.body;
-
-        const crearBolsillo = await sequelize.query(
-          "SELECT * FROM crear_bolsillo(:idUsuario::INT, :idCuenta::INT, :nombre::VARCHAR(20), :saldoObjetivo::DECIMAL(16,2));",
-          {
-            replacements: { idUsuario, idCuenta, nombre, saldoObjetivo },
-          }
+      const { idUsuario } = jwt.verify(token, process.env.SECRETJWT);
+      const idCuenta =
+        await CuentasController.prototype.consultarIdCuentaIdUsuarioAUX(
+          idUsuario
         );
 
-        if (crearBolsillo[0].length > 0) {
-          res.status(200).json(
-            utils.successResponse("Bolsillo creado correctamente.", {
-              bolsillo: utils.convertSnakeToCamel(crearBolsillo[0][0]),
-            })
-          );
-        } else {
-          res
-            .status(200)
-            .json(
-              utils.warningResponse("No se creó el bolsillo.", { bolsillo: [] })
-            );
+      const { nombre, saldoObjetivo } = req.body;
+
+      const crearBolsillo = await sequelize.query(
+        "SELECT * FROM crear_bolsillo(:idUsuario::INT, :idCuenta::INT, :nombre::VARCHAR(20), :saldoObjetivo::DECIMAL(16,2));",
+        {
+          replacements: { idUsuario, idCuenta, nombre, saldoObjetivo },
         }
+      );
+
+      if (crearBolsillo[0].length > 0) {
+        res.status(200).json(
+          utils.successResponse("Bolsillo creado correctamente.", {
+            bolsillo: utils.convertSnakeToCamel(crearBolsillo[0][0]),
+          })
+        );
       } else {
         res
-          .status(401)
+          .status(200)
           .json(
-            utils.errorResponse(
-              "No se puede crear el bolsillo. Autenticación no proporcionada.",
-              null
-            )
+            utils.warningResponse("No se creó el bolsillo.", { bolsillo: [] })
           );
       }
     } catch (error) {
@@ -126,38 +104,25 @@ class BolsillosController {
     try {
       const token = req.headers.authorization;
 
-      if (token) {
-        const { idUsuario } = jwt.verify(token, process.env.SECRETJWT);
+      const { idUsuario } = jwt.verify(token, process.env.SECRETJWT);
 
-        const { idBolsillo, nombre, saldoObjetivo } = req.body;
+      const { idBolsillo, nombre, saldoObjetivo } = req.body;
 
-        const editarBolsillo = await sequelize.query(
-          "SELECT * FROM editar_bolsillo(:idUsuario::INT, :idBolsillo::INT, :nombre::VARCHAR(20), :saldoObjetivo::DECIMAL(16,2));",
-          {
-            replacements: { idUsuario, idBolsillo, nombre, saldoObjetivo },
-          }
-        );
-
-        if (editarBolsillo[0][0].editar_bolsillo) {
-          res
-            .status(200)
-            .json(
-              utils.successResponse("Bolsillo editado correctamente.", null)
-            );
-        } else {
-          res
-            .status(200)
-            .json(utils.warningResponse("No se editó el bolsillo.", null));
+      const editarBolsillo = await sequelize.query(
+        "SELECT * FROM editar_bolsillo(:idUsuario::INT, :idBolsillo::INT, :nombre::VARCHAR(20), :saldoObjetivo::DECIMAL(16,2));",
+        {
+          replacements: { idUsuario, idBolsillo, nombre, saldoObjetivo },
         }
+      );
+
+      if (editarBolsillo[0][0].editar_bolsillo) {
+        res
+          .status(200)
+          .json(utils.successResponse("Bolsillo editado correctamente.", null));
       } else {
         res
-          .status(401)
-          .json(
-            utils.errorResponse(
-              "No se puede editar el bolsillo. Autenticación no proporcionada.",
-              null
-            )
-          );
+          .status(200)
+          .json(utils.warningResponse("No se editó el bolsillo.", null));
       }
     } catch (error) {
       res
@@ -309,40 +274,29 @@ class BolsillosController {
     try {
       const token = req.headers.authorization;
 
-      if (token) {
-        const { idUsuario } = jwt.verify(token, process.env.SECRETJWT);
+      const { idUsuario } = jwt.verify(token, process.env.SECRETJWT);
 
-        const { idBolsillo } = req.body;
+      const { idBolsillo } = req.body;
 
-        const eliminarBolsillo = await sequelize.query(
-          "SELECT eliminar_bolsillo(:idUsuario::INT, :idBolsillo::INT);",
-          {
-            replacements: { idUsuario, idBolsillo },
-          }
-        );
-
-        if (eliminarBolsillo[0][0].eliminar_bolsillo) {
-          res
-            .status(200)
-            .json(
-              utils.successResponse("Bolsillo eliminado correctamente.", null)
-            );
-        } else {
-          res
-            .status(200)
-            .json(
-              utils.warningResponse(
-                "No se eliminó el bolsillo. Verifica que no tenga saldo disponible.",
-                null
-              )
-            );
+      const eliminarBolsillo = await sequelize.query(
+        "SELECT eliminar_bolsillo(:idUsuario::INT, :idBolsillo::INT);",
+        {
+          replacements: { idUsuario, idBolsillo },
         }
+      );
+
+      if (eliminarBolsillo[0][0].eliminar_bolsillo) {
+        res
+          .status(200)
+          .json(
+            utils.successResponse("Bolsillo eliminado correctamente.", null)
+          );
       } else {
         res
-          .status(401)
+          .status(200)
           .json(
-            utils.errorResponse(
-              "No se puede eliminar el bolsillo. Autenticación no proporcionada.",
+            utils.warningResponse(
+              "No se eliminó el bolsillo. Verifica que no tenga saldo disponible.",
               null
             )
           );
