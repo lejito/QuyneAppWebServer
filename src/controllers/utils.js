@@ -22,12 +22,12 @@ function createResponse(type, message, data, error) {
     message,
     data,
     error,
-    time: new Date()
+    time: new Date(),
   };
-};
+}
 
 function createResponseRequired(baseResponse, requiredParams) {
-  return { ...baseResponse, requiredParams }
+  return { ...baseResponse, requiredParams };
 }
 
 module.exports = {
@@ -56,7 +56,10 @@ module.exports = {
       if (!(param.name in req.body)) {
         missingParams.push(param);
       } else if (!param.nullable) {
-        if (req.body[param.name] === null || req.body[param.name] === undefined) {
+        if (
+          req.body[param.name] === null ||
+          req.body[param.name] === undefined
+        ) {
           nullParams.push(param);
         } else if (!(typeof req.body[param.name] === param.type)) {
           invalidParams.push(param);
@@ -64,14 +67,22 @@ module.exports = {
       }
     }
 
-    if (missingParams.length > 0 || invalidParams.length > 0 || nullParams.length > 0) {
-      res.status(400).json(createResponseRequired(
-        this.errorResponse(
-          'Los datos proporcionados no son los suficientes, son nulos o no son del tipo válido.',
-          null
-        ),
-        { missingParams, nullParams, invalidParams }
-      ));
+    if (
+      missingParams.length > 0 ||
+      invalidParams.length > 0 ||
+      nullParams.length > 0
+    ) {
+      res
+        .status(400)
+        .json(
+          createResponseRequired(
+            this.errorResponse(
+              "Los datos proporcionados no son los suficientes, son nulos o no son del tipo válido.",
+              null
+            ),
+            { missingParams, nullParams, invalidParams }
+          )
+        );
       return false;
     } else {
       return true;
@@ -82,22 +93,21 @@ module.exports = {
     if (obj === null || typeof obj !== "object") {
       return obj;
     }
-  
+
     if (Array.isArray(obj)) {
       return obj.map((item) => this.convertSnakeToCamel(item));
     }
-  
+
     const camelCaseObj = {};
     for (const key in obj) {
       if (Object.prototype.hasOwnProperty.call(obj, key)) {
-        const camelKey = key.replace(/_./g, (match) => match.charAt(1).toUpperCase());
+        const camelKey = key.replace(/_./g, (match) =>
+          match.charAt(1).toUpperCase()
+        );
         camelCaseObj[camelKey] = obj[key];
       }
     }
-  
+
     return camelCaseObj;
-  }
-  
-
-
-}
+  },
+};

@@ -1,6 +1,6 @@
 "use strict";
-const routes = require('./src/routes');
-const express = require('express');
+const routes = require("./src/routes");
+const express = require("express");
 const app = express();
 
 app.use(express.json());

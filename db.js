@@ -1,6 +1,6 @@
-"use strict"
-const { Sequelize } = require('sequelize');
-require('dotenv').config();
+"use strict";
+const { Sequelize } = require("sequelize");
+require("dotenv").config();
 
 const sequelize = new Sequelize({
   host: process.env.DBHOST,
@@ -13,14 +13,14 @@ const sequelize = new Sequelize({
   pool: {
     max: 10,
     min: 0,
-    idle: 10000
+    idle: 10000,
   },
   dialectOptions: {
     ssl: {
       require: true,
-      rejectUnauthorized: false
-    }
-  }
+      rejectUnauthorized: false,
+    },
+  },
 });
 
 module.exports = sequelize;

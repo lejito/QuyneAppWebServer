@@ -37,7 +37,6 @@ class CuentasController {
 
       return idCuenta;
     } catch (error) {
-      console.log(error);
       return -1;
     }
   }
