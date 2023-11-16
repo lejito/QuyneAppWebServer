@@ -178,6 +178,7 @@ class MovimientosController {
                   null
                 )
               );
+            return;
           }
         }
 
