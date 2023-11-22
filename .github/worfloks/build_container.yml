@@ -1,5 +1,4 @@
 name: Building of the container
-
 on:
   push:
     branches:
