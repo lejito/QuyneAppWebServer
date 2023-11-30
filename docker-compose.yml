@@ -1,9 +1,0 @@
-version: "2.2"
-services:
-
-  web:
-    image: ${DOCKER_IMAGE_NAME}
-    container_name: "quyne_app_backend:v${TAG}"
-    build: .
-    ports:
-      - "4200:80"
