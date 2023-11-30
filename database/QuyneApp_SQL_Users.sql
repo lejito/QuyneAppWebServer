@@ -1,0 +1,45 @@
+--- QUYNEAPPDB - GOOGLE DRIVE: https://drive.google.com/drive/folders/1N4EG9pGkzNvGnHF8qf4QDJdi2HwiepJt?usp=drive_link
+
+
+--
+-- USUARIOS
+--
+
+
+-- SUPERUSUARIO
+CREATE ROLE quyneappdb_god LOGIN SUPERUSER PASSWORD '56>r&zT:pVq7ls[B'; -- Solo se puede crear por medio de otro superusuario
+
+
+-- CREACIÓN DE ROL DE LECTURA Y ESCRITURA
+CREATE ROLE readwrite PASSWORD 'ZyQKz]7=701(\\`N';  
+GRANT CONNECT ON DATABASE quyneappdb TO readwrite;
+GRANT USAGE, CREATE ON SCHEMA public TO readwrite;
+GRANT SELECT, INSERT, UPDATE, DELETE ON ALL TABLES IN SCHEMA public TO readwrite;
+ALTER DEFAULT PRIVILEGES IN SCHEMA public GRANT SELECT, INSERT, UPDATE, DELETE ON TABLES TO readwrite;
+GRANT USAGE ON ALL SEQUENCES IN SCHEMA public TO readwrite;
+ALTER DEFAULT PRIVILEGES IN SCHEMA public GRANT USAGE ON SEQUENCES TO readwrite;
+
+
+-- USUARIOS PARA EL EQUIPO DE TRABAJO
+CREATE ROLE quyneappdb_alejo LOGIN PASSWORD 'ZyQKz]7=701(\\`N';
+GRANT readwrite TO quyneappdb_alejo;
+
+CREATE ROLE quyneappdb_adrian LOGIN PASSWORD 'ZyQKz]7=701(\\`N';
+GRANT readwrite TO quyneappdb_adrian;
+
+CREATE ROLE quyneappdb_fercho LOGIN PASSWORD 'ZyQKz]7=701(\\`N';
+GRANT readwrite TO quyneappdb_fercho;
+
+
+-- USUARIO PARA EL PROFESOR
+CREATE ROLE quyneappdb_teacher LOGIN PASSWORD 'K-98KckvS/31(B35';
+GRANT readwrite TO quyneappdb_teacher;
+
+
+-- USUARIO PARA LA APLICACIÓN (BACKEND)
+CREATE ROLE quyneappdb_app LOGIN PASSWORD 'hjA*W7r$il92`{20';
+GRANT USAGE ON SCHEMA public TO quyneappdb_app;
+GRANT SELECT, INSERT, UPDATE, DELETE ON ALL TABLES IN SCHEMA public TO quyneappdb_app;
+ALTER DEFAULT PRIVILEGES IN SCHEMA public GRANT SELECT, INSERT, UPDATE, DELETE ON TABLES TO quyneappdb_app;
+GRANT USAGE ON ALL SEQUENCES IN SCHEMA public TO quyneappdb_app;
+ALTER DEFAULT PRIVILEGES IN SCHEMA public GRANT USAGE ON SEQUENCES TO quyneappdb_app;
